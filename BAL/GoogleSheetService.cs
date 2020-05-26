@@ -1,6 +1,8 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,7 @@ namespace MngVm.BAL
     {
 
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
-        private static readonly string ApplicationName = "Give Any Name";
-        private static readonly string SpreadsheetId = "";
-        private static readonly string sheet = "sheetName on bottom of sheet tabs";
+        private static readonly string ApplicationName = "ManageVM";
 
         private GoogleCredential credential;
 
@@ -22,7 +22,7 @@ namespace MngVm.BAL
 
         public GoogleSheetService()
         {
-            credential = GoogleCredential.FromFile(System.Web.Hosting.HostingEnvironment.MapPath("~/Credentials/azureauth.properties"))
+            credential = GoogleCredential.FromFile(System.Web.Hosting.HostingEnvironment.MapPath("~/Credentials/googleauth.json"))
                 .CreateScoped(Scopes);
 
             service = new SheetsService(new BaseClientService.Initializer()
@@ -31,6 +31,19 @@ namespace MngVm.BAL
                 ApplicationName = ApplicationName
             });
 
+        }
+
+        public void UpdateEntity(string spreadsheetId, string sheetName)
+        {
+            string range = $"{ sheetName }!D5";
+            var valuesRange = new ValueRange();
+            var objectList = new List<object>() { "Running" };
+            valuesRange.Values = new List<IList<object>> { objectList };
+
+            var updateReq = service
+                .Spreadsheets.Values.Update(valuesRange, spreadsheetId, range);
+            updateReq.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var updateRespo = updateReq.Execute();
         }
 
     }
