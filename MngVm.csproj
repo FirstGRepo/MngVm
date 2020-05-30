@@ -260,8 +260,8 @@
     <Compile Include="Constant\CommonConstant.cs" />
     <Compile Include="Constant\KeyConstant.cs" />
     <Compile Include="Constant\MessageConstant.cs" />
-    <Compile Include="Common\Constant.cs" />
-    <Compile Include="Common\GoogleContants.cs" />
+    <Compile Include="Constant\Constant.cs" />
+    <Compile Include="Constant\GoogleContants.cs" />
     <Compile Include="Controllers\GoogleControlController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -1024,8 +1024,6 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
-    <Compile Include="Models\AuthResponse.cs" />
-    <Compile Include="Models\StatusesResponse.cs" />
     <Compile Include="Models\TokenModel.cs" />
     <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Models\RunCommandRequest.cs" />
@@ -1067,11 +1065,8 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\GoogleControl\Index.cshtml" />
-    <Content Include="Views\Home\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

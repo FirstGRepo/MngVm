@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 
-namespace MngVm.Common
+namespace MngVm.Constant
 {
     public class Constant
     {
@@ -22,6 +22,10 @@ namespace MngVm.Common
         public static readonly string OperationStart = "start";
         public static readonly string OperationStop = "deallocate";
 
+        public static readonly string UserSheetId = Convert.ToString(ConfigurationManager.AppSettings["gsvmSpreadSheetID"]);
+        public static readonly string UserSheetName = Convert.ToString(ConfigurationManager.AppSettings["gsvmSheetName"]);
+        public static readonly string UserEmailIdColumn = Convert.ToString(ConfigurationManager.AppSettings["gsvmEmailIdColumn"]);
+        public static readonly string UserDefaultVMColumn = Convert.ToString(ConfigurationManager.AppSettings["gsvmDefaultVMColumn"]);
 
         public static string GetAuthUrl()
         {

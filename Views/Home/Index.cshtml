@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "VM Details";
 }
-@model API_CALL.Models.UserProfile
+@model MngVm.Models.UserProfile
 
 <div class="row">
 
@@ -10,20 +10,20 @@
     {
         <div class="vmstatusdiv">
             <div class="pull-left ms-10">
-                Machine Name -
+                Machine -
                 <span id="machine" class="status lblMachine" style="background:gray;">@machine</span>
             </div>
             <div class="pull-left">
-                VM Status -
+                Status -
                 <img class="loader" src="~/Content/images/loader.gif" style="image-rendering:pixelated; height:23px; width:62px;" />
                 <span id="@machine" class="status @machine" style="display:none;"></span>
             </div>
             @*<div class="pull-left">
-                    <span>OFF</span> <label class="switch">
-                        <input type="checkbox" id="handler">
-                        <span class="slider round"></span>
-                    </label> <span>ON</span>
-                </div>*@
+                <span>OFF</span> <label class="switch">
+                    <input type="checkbox" id="handler">
+                    <span class="slider round"></span>
+                </label> <span>ON</span>
+            </div>*@
         </div>
     }
 </div>
@@ -36,9 +36,9 @@
             debugger;
             var isOn = $(this).is(':checked');
             if (isOn) {
-                callAPI('@Url.Action("Start", "VmOperation",null)')
+                callAPI('@Url.Action("Start", "Home",null)')
             } else {
-                callAPI('@Url.Action("Stop", "VmOperation", null)');
+                callAPI('@Url.Action("Stop", "Home", null)');
             }
         });
     });
@@ -63,7 +63,7 @@
 
     function getStatus(element) {
         var machinename = $(element).text();
-        var urlnew = '@Url.Action("GetStatus", "VmOperation",null)';
+        var urlnew = '@Url.Action("GetStatus", "Home",null)';
         $.ajax({
             type: "GET",
             url: urlnew + '?machineName=' + machinename,
@@ -72,15 +72,15 @@
             success: function (data) {
                 debugger;
                 $('.' + machinename).prev().hide();
-                if (data.displayStatus == null || data.displayStatus.indexOf('deallocat') > 0) {
-                        //$('#handler').prop('checked', false);
-                        $('.' + machinename).addClass('off');
+                if (data.Value == null || data.Value.indexOf('deallocat') > 0) {
+                    //$('#handler').prop('checked', false);
+                    $('.' + machinename).addClass('off');
                 }
                 else {
                     //$('#handler').prop('checked', true);
                     $('.' + machinename).addClass('on');
                 }
-                $('.' + machinename).text(data.displayStatus == null ? 'Not Available' : data.displayStatus).fadeIn();
+                $('.' + machinename).text(data.Value == null ? 'Not Available' : data.Value).fadeIn();
             },
             error: function (textStatus, errorThrown) {
                 debugger;

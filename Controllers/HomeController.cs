@@ -1,5 +1,5 @@
 ﻿using MngVm.BAL;
-using MngVm.Common;
+using MngVm.Constant;
 using MngVm.Models;
 using System;
 using System.Collections.Generic;
@@ -11,66 +11,59 @@ namespace MngVm.Controllers
 {
     public class HomeController : Controller
     {
+        GoogleSheetService _gService = null;
+        AzurePortalService _azService = null;
+
+        public HomeController()
+        {
+            _gService = new GoogleSheetService();
+            _azService = new AzurePortalService();
+        }
+
         public ActionResult Index()
         {
             string username = Convert.ToString(Session["username"]);
-            // ApiService service = new ApiService();
-            GoogleService google = new GoogleService();
             if (!string.IsNullOrEmpty(username))
             {
-                UserProfile user = new UserProfile();
-                user.email = username;
-                user.machines = google.getVM(username);
-                if (user.machines.Count > 0)
+                UserProfile user = _gService.GetUserVMDetail(username);
+                if (user.IsNotNull() && user.machines.Count > 0)
                 {
-                    //foreach (var vmName in user.machines)
-                    //{
-                    //    var retVal = service.getStatus(vmName);
-                    //    if (retVal.displayStatus != null && retVal.displayStatus.Contains("deallocat"))
-                    //        service.onActionServer(Constant.OperationStart, vmName);
-                    //}
+                    foreach (var vmName in user.machines)
+                    {
+                        var powerState = _azService.GetVMStatus(Constant.Constant.resourceGroupName, vmName);
+                        if (powerState != null && powerState.Value.Contains("deallocat"))
+                            _azService.Start(Constant.Constant.resourceGroupName, vmName);
+                    }
                     return View(user);
                 }
                 else
-                    return Content("No macchine found which assigned to your login, Please contact to your team.");
+                    return Content(MessageConstant.NoMachineFound);
             }
             else
-                return Content("Please Login with google, to proceed click <a href='/'>here</a>. ");
+                return Content(MessageConstant.LoginUrl);
         }
 
-        //public ActionResult GetStatus(string machineName)
-        //{
-        //    //ApiService service = new ApiService();
-        //    var retVal = service.getStatus(machineName);
-        //    return Json(retVal, JsonRequestBehavior.AllowGet);
-        //}
+        public ActionResult GetStatus(string machineName)
+        {
+            var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, machineName);
+            return Json(retVal, JsonRequestBehavior.AllowGet);
+        }
 
-        // public ActionResult Start()
-        //{
-        //    string username = Convert.ToString(Session["username"]);
-        //   // ApiService service = new ApiService();
-        //    GoogleService google = new GoogleService();
-
-        //    List<string> VMs = google.getVM(username);
-        //    bool retVal = service.onActionServer(Constant.OperationStart, VMs[0]);
-        //    return Json(retVal, JsonRequestBehavior.AllowGet);
-        //}
+        public ActionResult Start()
+        {
+            string username = Convert.ToString(Session["username"]);
+            UserProfile user = _gService.GetUserVMDetail(username);
+            _azService.Start(Constant.Constant.resourceGroupName, user.machines[0]);
+            var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, user.machines[0]);
+            return Json(retVal, JsonRequestBehavior.AllowGet);
+        }
 
         //public ActionResult Stop()
         //{
         //    string username = Convert.ToString(Session["username"]);
-        //    //ApiService service = new ApiService();
-        //    GoogleService google = new GoogleService();
-        //    List<string> VMs = google.getVM(username);
-        //    bool retVal = service.onActionServer(Constant.OperationStop, VMs[0]);
-        //    return Json(retVal, JsonRequestBehavior.AllowGet);
-        //}
-
-        //public ActionResult list()
-        //{
-        //    string username = Convert.ToString(Session["username"]);
-        //    ApiService service = new ApiService();
-        //    bool retVal = service.getList();
+        //    UserProfile user = _gService.GetUserVMDetail(username);
+        //    _azService.Deallocate(Constant.Constant.resourceGroupName, user.machines[0]);
+        //    var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, user.machines[0]);
         //    return Json(retVal, JsonRequestBehavior.AllowGet);
         //}
 
@@ -85,7 +78,7 @@ namespace MngVm.Controllers
                 return Content("Email not found");
             else
             {
-                if (Constant.IsProduction)
+                if (Constant.Constant.IsProduction)
                 {
                     if (userinfo.email.Contains("@organizedgains.com"))
                         return RedirectToAction("index");

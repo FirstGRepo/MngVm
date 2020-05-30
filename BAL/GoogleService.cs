@@ -7,7 +7,7 @@ using System.Web.Script.Serialization;
 using System.Data;
 using System.Net.Http;
 using Newtonsoft.Json;
-using MngVm.Common;
+using MngVm.Constant;
 using MngVm.Models;
 
 namespace MngVm.BAL
@@ -15,11 +15,12 @@ namespace MngVm.BAL
     public class GoogleService
     {
         public GoogleSheetService _sheetService = new GoogleSheetService();
+
         public string GetToken(string code)
         {
             string poststring = "grant_type=authorization_code&code=" + code + "&client_id=" + GoogleContants.CLIENTID
                                  + "&client_secret=" + GoogleContants.SECRETE_KEY + "&redirect_uri=" +
-                                 (Constant.IsProduction ? GoogleContants.REDIRECT_PROD : GoogleContants.REDIRECT_LOCAL);
+                                 (Constant.Constant.IsProduction ? GoogleContants.REDIRECT_PROD : GoogleContants.REDIRECT_LOCAL);
             string url = "https://accounts.google.com/o/oauth2/token";
 
             var request = (HttpWebRequest)WebRequest.Create(url);
@@ -76,41 +77,5 @@ namespace MngVm.BAL
             return userinfo;
         }
 
-        //public DataTable getSheetData()
-        //{
-        //    using (var client = new System.Net.Http.HttpClient())
-        //    {
-        //        string sheetUrl = GoogleContants.SheetURL;
-        //        string response = string.Empty;
-        //        HttpResponseMessage Res = client.GetAsync(sheetUrl).Result;
-        //        DataTable dt = null;
-        //        if (Res.IsSuccessStatusCode)
-        //        {
-        //            response = Res.Content.ReadAsStringAsync().Result;
-        //            dt = (DataTable)JsonConvert.DeserializeObject(response, (typeof(DataTable)));
-        //        }
-        //        return dt;
-        //    }
-
-        //}
-
-        public List<string> getVM(string userName)
-        {
-            List<string> vmAssigned = new List<string>();
-            //DataTable table = getSheetData();
-            //DataRow[] result = table.Select("USER_EMAIL ='" + userName + "'");
-            GoogleSheetService service2 = new GoogleSheetService();
-            // service2.
-            //foreach (DataRow row in result)
-            //{
-            //    string VmIDs = Convert.ToString(row["VM_ID"]);
-            //    string[] VmArr = VmIDs.Split(',');
-            //    foreach (string vmName in VmArr)
-            //    {
-            //        vmAssigned.Add(Convert.ToString(vmName).Trim());
-            //    }
-            //}
-            return vmAssigned;
-        }
     }
 }

@@ -54,6 +54,11 @@ namespace MngVm.Models
             set;
         }
 
+        public int rowId
+        {
+            get;
+            set;
+        }
         public List<string> machines
         {
             get;

@@ -5,7 +5,6 @@ using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using MngVm.Constant;
 using System;
-using MngVm.Common;
 
 namespace MngVm.BAL
 {
@@ -13,7 +12,6 @@ namespace MngVm.BAL
     {
         private AzureCredentials credentials;
         public IAzure service;
-        public string ResourceGroupName = Constant.resourceGroupName;
         public AzurePortalService()
         {
             credentials = SdkContext.AzureCredentialsFactory
@@ -27,7 +25,7 @@ namespace MngVm.BAL
 
         }
 
-        public IVirtualMachine GetVM(string vmName)
+        public IVirtualMachine GetVM(string groupName,string vmName)
         {
             return service.VirtualMachines.GetByResourceGroup(groupName, vmName);
         }
@@ -36,15 +34,15 @@ namespace MngVm.BAL
         {
             return service.VirtualMachines.GetByResourceGroup(groupName, vmName);
         }
-        public void Start(string vmName)
+        public void Start(string groupName, string vmName)
         {
-            IVirtualMachine machine = GetVM(vmName);
+            IVirtualMachine machine = GetVM(groupName,vmName);
             machine.Start();
         }
 
-        public PowerState GetVMStatus(string vmName)
+        public PowerState GetVMStatus(string groupName, string vmName)
         {
-            IVirtualMachine machine = GetVM(vmName);
+            IVirtualMachine machine = GetVM(groupName,vmName);
             return machine.PowerState;
         }
     }
