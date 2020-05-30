@@ -91,6 +91,7 @@ namespace MngVm.BAL
 
                     _return = new VMLogSheetDetail()
                     {
+                        rowId = searchedRowIndex,
                         ServerName = GetCellValue(spreadsheetId, sheetName, _serverCell)?.ToString(),
                         ServerDateTime = GetCellValue(spreadsheetId, sheetName, _serverDateTimeCell)?.ToString(),
                         ServerStatus = GetCellValue(spreadsheetId, sheetName, _serverStatusCell)?.ToString(),
@@ -267,5 +268,46 @@ namespace MngVm.BAL
 
             return _return;
         }
+
+        public VMLogAutoShut GetVMAutoShutDetail()
+        {
+            VMLogAutoShut _return = null;
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _lastUpdatedCell = azureVMLogger.LastSheetUpdated;
+                    string _autoShutTimeCell = azureVMLogger.AutoShutTime;
+
+                    string _lastUpdatedCellValue = GetCellValue(spreadsheetId, sheetName, _lastUpdatedCell)?.ToString();
+                    string _autoShutTimeCellValue = GetCellValue(spreadsheetId, sheetName, _autoShutTimeCell)?.ToString();
+
+                    _return = new VMLogAutoShut()
+                    {
+
+                        AutoShutTime = _autoShutTimeCellValue.IsNullOrEmpty() ? default : TimeSpan.Parse(_autoShutTimeCellValue),
+                        LastUpdated = _lastUpdatedCellValue.IsNullOrEmpty() ? default : Convert.ToDateTime(_lastUpdatedCellValue),
+
+                    };
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return _return;
+        }
+
+
     }
 }

@@ -40,21 +40,34 @@ namespace MngVm.API
             if (runCmdRequest.IsNotNull())
             {
                 AzureVMLogger _prop = new AzureVMLogger();
-
-                var vmSheetDetail = googleService.GetVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName, runCmdRequest.VmName);
-
                 var vmDetail = azureService.GetVMDetail(runCmdRequest.ResourceName, runCmdRequest.VmName);
+                if (vmDetail.IsNotNull())
+                {
+
+
+                    var vmSheetDetail = googleService.GetVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName, runCmdRequest.VmName);
+
+                    if (vmSheetDetail.IsNotNull())
+                    {
+                        var autoShutDetail = googleService.GetVMAutoShutDetail();
+                    }
 
 
 
 
-                string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
+                    //azureService.StopVMByIDAsync(vmDetail.VMId);
+
+                    string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
 
 
-                googleService.UpdateCellValue(_prop.VMLogSpreadSheetID,
-                                              _prop.VMLogSheetName,
-                                              _prop.LastSheetUpdated,
-                                              currentDateTime);
+                    googleService.UpdateCellValue(_prop.VMLogSpreadSheetID,
+                                                  _prop.VMLogSheetName,
+                                                  _prop.LastSheetUpdated,
+                                                  currentDateTime);
+
+
+
+                }
 
 
             }
