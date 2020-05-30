@@ -256,6 +256,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="BAL\AzurePortalService.cs" />
     <Compile Include="BAL\GoogleSheetService.cs" />
+    <Compile Include="Constant\CommonConstant.cs" />
+    <Compile Include="Constant\KeyConstant.cs" />
+    <Compile Include="Constant\MessageConstant.cs" />
     <Compile Include="Controllers\GoogleControlController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -1018,6 +1021,8 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
+    <Compile Include="Models\RunCommandRequest.cs" />
+    <Compile Include="Models\VMLogSheetDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1062,7 +1067,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

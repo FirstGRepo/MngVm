@@ -3,6 +3,7 @@ using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
+using MngVm.Constant;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace MngVm.BAL
         public AzurePortalService()
         {
             credentials = SdkContext.AzureCredentialsFactory
-                            .FromFile(System.Web.Hosting.HostingEnvironment.MapPath("~/Credentials/azureauth.properties"));
+                            .FromFile(CommonConstant.AzureAuthFilePath);
 
             service = Azure
                 .Configure()
@@ -30,10 +31,12 @@ namespace MngVm.BAL
 
         public IVirtualMachine GetVM(string groupName, string vmName)
         {
-            groupName = "ADrG";
-            vmName = "HP01VM-0";
             return service.VirtualMachines.GetByResourceGroup(groupName, vmName);
         }
 
+        public IVirtualMachine GetVMDetail(string groupName, string vmName)
+        {
+            return service.VirtualMachines.GetByResourceGroup(groupName, vmName);
+        }
     }
 }
