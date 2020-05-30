@@ -255,10 +255,13 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="BAL\AzurePortalService.cs" />
+    <Compile Include="BAL\GoogleService.cs" />
     <Compile Include="BAL\GoogleSheetService.cs" />
     <Compile Include="Constant\CommonConstant.cs" />
     <Compile Include="Constant\KeyConstant.cs" />
     <Compile Include="Constant\MessageConstant.cs" />
+    <Compile Include="Common\Constant.cs" />
+    <Compile Include="Common\GoogleContants.cs" />
     <Compile Include="Controllers\GoogleControlController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -1021,6 +1024,10 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
+    <Compile Include="Models\AuthResponse.cs" />
+    <Compile Include="Models\StatusesResponse.cs" />
+    <Compile Include="Models\TokenModel.cs" />
+    <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Models\RunCommandRequest.cs" />
     <Compile Include="Models\VMLogSheetDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1064,6 +1071,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\GoogleControl\Index.cshtml" />
+    <Content Include="Views\Home\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

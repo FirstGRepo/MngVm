@@ -3,6 +3,7 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Microsoft.Rest;
 using MngVm.BAL;
+using MngVm.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,17 +15,19 @@ namespace MngVm.Controllers
 {
     public class GoogleControlController : Controller
     {
-        // GET: GoogleControl
         public ActionResult Index()
+        {
+            return View();
+        }
+        public ActionResult GetSheet()
         {
             GoogleSheetService gService = new GoogleSheetService();
 
-            string spreadsheetId = "1Doq86OH2r5IfNl06LsrpBG8uEfIDuPSTaCUArtKo5LU";
+            string spreadsheetId = GoogleContants.SheetId;//"1E3PsxeWZT3QjzYC17-MKwLixY1DU-ZaSniTTeSosQN8"
 
-            string sheet = "Workspace Log";
+            string sheet = "Sheet1";
             var range = $"{sheet}!A4:E5";
             var request = gService.service.Spreadsheets.Values.Get(spreadsheetId, range);
-
 
             var response = request.Execute();
             var values = response.Values;
@@ -37,12 +40,15 @@ namespace MngVm.Controllers
 
             }
 
-            gService.UpdateEntity(spreadsheetId, sheet);
-
-
-
+            //gService.UpdateEntity(spreadsheetId, sheet);
 
             return View();
+        }
+        public ActionResult RedirectToGoogle()
+        {
+            {
+                return Redirect(GoogleContants.redirectToGoogleLogin());
+            }
         }
     }
 }

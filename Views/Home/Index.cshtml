@@ -1,31 +1,98 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "VM Details";
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+@model API_CALL.Models.UserProfile
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+
+    <h3>Welcome @Model.email</h3>@foreach (var machine in Model.machines)
+    {
+        <div class="vmstatusdiv">
+            <div class="pull-left ms-10">
+                Machine Name -
+                <span id="machine" class="status lblMachine" style="background:gray;">@machine</span>
+            </div>
+            <div class="pull-left">
+                VM Status -
+                <img class="loader" src="~/Content/images/loader.gif" style="image-rendering:pixelated; height:23px; width:62px;" />
+                <span id="@machine" class="status @machine" style="display:none;"></span>
+            </div>
+            @*<div class="pull-left">
+                    <span>OFF</span> <label class="switch">
+                        <input type="checkbox" id="handler">
+                        <span class="slider round"></span>
+                    </label> <span>ON</span>
+                </div>*@
+        </div>
+    }
 </div>
+
+@*<script src="~/scripts/VM/operateVm.js"></script>*@
+
+<script>
+    $(document).ready(function () {
+        $('#handler').change(function () {
+            debugger;
+            var isOn = $(this).is(':checked');
+            if (isOn) {
+                callAPI('@Url.Action("Start", "VmOperation",null)')
+            } else {
+                callAPI('@Url.Action("Stop", "VmOperation", null)');
+            }
+        });
+    });
+    function callAPI(operation) {
+        var urlnew = operation
+        $.ajax({
+            type: "GET",
+            url: urlnew,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                Success = data;
+                getStatus();
+            },
+            error: function (textStatus, errorThrown) {
+                debugger;
+                //$('#handler').prop('checked', false)
+                alert(textStatus.responseJSON.error.message);
+            }
+        });
+    }
+
+    function getStatus(element) {
+        var machinename = $(element).text();
+        var urlnew = '@Url.Action("GetStatus", "VmOperation",null)';
+        $.ajax({
+            type: "GET",
+            url: urlnew + '?machineName=' + machinename,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                debugger;
+                $('.' + machinename).prev().hide();
+                if (data.displayStatus == null || data.displayStatus.indexOf('deallocat') > 0) {
+                        //$('#handler').prop('checked', false);
+                        $('.' + machinename).addClass('off');
+                }
+                else {
+                    //$('#handler').prop('checked', true);
+                    $('.' + machinename).addClass('on');
+                }
+                $('.' + machinename).text(data.displayStatus == null ? 'Not Available' : data.displayStatus).fadeIn();
+            },
+            error: function (textStatus, errorThrown) {
+                debugger;
+                //  $('#handler').prop('checked', false)
+                alert(textStatus.responseJSON.error.message);
+            }
+        });
+    }
+
+    $(window).on('load', function () {
+        $('.lblMachine').each(function () {
+            getStatus($(this));
+        })
+    });
+</script>
