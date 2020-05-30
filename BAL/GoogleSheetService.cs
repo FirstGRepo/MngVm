@@ -201,7 +201,7 @@ namespace MngVm.BAL
                 var getServerResponse = getServerRequest.Execute();
                 if (getServerResponse.IsNotNull() && getServerResponse.Values.IsNotNull() && getServerResponse.Values.Count > 0)
                 {
-                    int count = Convert.ToInt32(UserEmailIDColRowIndex.ToString())-1;
+                    int count = Convert.ToInt32(UserEmailIDColRowIndex.ToString()) - 1;
                     foreach (var item in getServerResponse.Values)
                     {
                         count++;
@@ -253,10 +253,10 @@ namespace MngVm.BAL
                     {
                         machines = machines,
                         rowId = searchedRowIndex,
-                        email=emailId
+                        email = emailId
                     };
 
-                  
+
                 }
 
             }
@@ -295,6 +295,102 @@ namespace MngVm.BAL
 
                     };
 
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return _return;
+        }
+
+        public bool UpdateVmLogUserStatus(int rowID, string value, bool IsUpdateDate)
+        {
+            bool _return = false;
+
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (rowID > 0 && azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _UserActiveCol = azureVMLogger.UserActiveColumn;
+                    char _UserActiveColRowIndex = azureVMLogger.UserActiveColumn[1];
+                    char _UserActiveColIndex = azureVMLogger.UserActiveColumn[0];
+
+                    string _UserActiveDateTimeCol = azureVMLogger.UserActiveDateTimeColumn;
+                    char _UserActiveDateTimeColRowIndex = azureVMLogger.UserActiveDateTimeColumn[1];
+                    char _UserActiveDateTimeColIndex = azureVMLogger.UserActiveDateTimeColumn[0];
+
+                    string UserActiveCellName = string.Concat(_UserActiveColIndex, rowID);
+                    string UserActiveDateTimeCellName = string.Concat(_UserActiveDateTimeColIndex, rowID);
+
+                    if (value.IsNotNullOrEmpty())
+                    {
+
+                        _return = UpdateCellValue(spreadsheetId, sheetName, UserActiveCellName, value);
+                        if (_return && IsUpdateDate)
+                        {
+                            string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
+                            UpdateCellValue(spreadsheetId, sheetName, UserActiveDateTimeCellName, currentDateTime);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return _return;
+        }
+        
+        public bool UpdateVmLogServerStatus(int rowID, string value, bool IsUpdateDate)
+        {
+            bool _return = false;
+
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (rowID > 0 && azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _ServerStatusCol = azureVMLogger.ServerStatusColumn;
+                    char _ServerStatusColRowIndex = azureVMLogger.ServerStatusColumn[1];
+                    char _ServerStatusColIndex = azureVMLogger.ServerStatusColumn[0];
+
+                    string _ServerDateTimeCol = azureVMLogger.ServerDateTimeColumn;
+                    char _ServerDateTimeColRowIndex = azureVMLogger.ServerDateTimeColumn[1];
+                    char _ServerDateTimeColIndex = azureVMLogger.ServerDateTimeColumn[0];
+
+                    string ServerStatusCellName = string.Concat(_ServerStatusColIndex, rowID);
+                    string ServerDateTimeCellName = string.Concat(_ServerDateTimeColIndex, rowID);
+
+                    if (value.IsNotNullOrEmpty())
+                    {
+
+                        _return = UpdateCellValue(spreadsheetId, sheetName, ServerStatusCellName, value);
+                        if (_return && IsUpdateDate)
+                        {
+                            string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
+                            UpdateCellValue(spreadsheetId, sheetName, ServerDateTimeCellName, currentDateTime);
+                        }
+
+                    }
 
                 }
 

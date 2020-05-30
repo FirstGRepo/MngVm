@@ -40,34 +40,95 @@ namespace MngVm.API
             if (runCmdRequest.IsNotNull())
             {
                 AzureVMLogger _prop = new AzureVMLogger();
-                var vmDetail = azureService.GetVMDetail(runCmdRequest.ResourceName, runCmdRequest.VmName);
-                if (vmDetail.IsNotNull())
+
+                TimeSpan excatIdleTime = CommonConstant.GetIdleTime(runCmdRequest.IdleTime);
+
+                bool isSessionNameNumeric = int.TryParse(runCmdRequest.SessionName, out int sessionInteger);
+
+                bool isUserActive = runCmdRequest.State.Contains("active", StringComparison.OrdinalIgnoreCase);
+
+                var vmSheetDetail = googleService.GetVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName, runCmdRequest.VmName);
+
+                if (vmSheetDetail.IsNotNull())
                 {
+                    var autoShutDetail = googleService.GetVMAutoShutDetail();
 
-
-                    var vmSheetDetail = googleService.GetVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName, runCmdRequest.VmName);
-
-                    if (vmSheetDetail.IsNotNull())
+                    var vmDetail = azureService.GetVMDetail(runCmdRequest.ResourceName, runCmdRequest.VmName);
+                    if (vmDetail.IsNotNull() && autoShutDetail.IsNotNull())
                     {
-                        var autoShutDetail = googleService.GetVMAutoShutDetail();
+
+                        //Machine is Off
+                        if (runCmdRequest.State.IsNull())
+                        {
+                            if (vmSheetDetail.ServerStatus.Contains(ServerStatus.Running, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Update Server status to Stop and change datetime of server
+                                googleService.UpdateVmLogServerStatus(vmSheetDetail.rowId, ServerStatus.Stopped, true);
+                            }
+
+                            if (vmSheetDetail.UserActiveStatus.Contains(UserStatus.Active, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Update user status to no and change datetime of user
+                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+                            }
+                        }
+                        else if (isSessionNameNumeric) //User is not connected to rdp
+                        {
+
+                            if (excatIdleTime >= autoShutDetail.AutoShutTime)
+                            {
+
+                                //Shutdown the machine and update in excel sheet with no user and server stopped
+                                azureService.StopVMByIDAsync(vmDetail.VMId);
+                                googleService.UpdateVmLogServerStatus(vmSheetDetail.rowId, ServerStatus.Stopped, true);
+                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+
+                            }
+                            else
+                            {
+                                if (vmSheetDetail.UserActiveStatus.Contains(UserStatus.Active, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    //Update user status to no and change datetime of user
+                                    googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+                                }
+                            }
+
+                        }
+                        else if (!isSessionNameNumeric) //User is connected to rdp
+                        {
+                            if (excatIdleTime >= autoShutDetail.AutoShutTime)
+                            {
+                                //Shutdown the machine and update in excel sheet with no user and server stopped
+                                azureService.StopVMByIDAsync(vmDetail.VMId);
+                                googleService.UpdateVmLogServerStatus(vmSheetDetail.rowId, ServerStatus.Stopped, true);
+                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+
+                            }
+                            else if (!vmSheetDetail.UserActiveStatus.Contains(UserStatus.Active, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Update user status to yes and change datetime of user
+                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.Active, true);
+                            }
+                        }
+
+
+
+
+                        //azureService.StopVMByIDAsync(vmDetail.VMId);
+
+                        string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
+
+
+                        googleService.UpdateCellValue(_prop.VMLogSpreadSheetID,
+                                                      _prop.VMLogSheetName,
+                                                      _prop.LastSheetUpdated,
+                                                      currentDateTime);
+
+
+
                     }
-
-
-
-
-                    //azureService.StopVMByIDAsync(vmDetail.VMId);
-
-                    string currentDateTime = DateTime.Now.ToString(CommonConstant.DateTimeFormat);
-
-
-                    googleService.UpdateCellValue(_prop.VMLogSpreadSheetID,
-                                                  _prop.VMLogSheetName,
-                                                  _prop.LastSheetUpdated,
-                                                  currentDateTime);
-
-
-
                 }
+
 
 
             }
