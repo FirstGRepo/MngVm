@@ -48,7 +48,6 @@ namespace MngVm.BAL
             var updateRespo = updateReq.Execute();
         }
 
-
         public bool UpdateCellValue(string spreadsheetId, string sheetName, string cellIndex, string value)
         {
             bool _return = false;
@@ -73,8 +72,6 @@ namespace MngVm.BAL
 
             return _return;
         }
-
-
 
         public VMLogSheetDetail GetVMLogDetail(string spreadsheetId, string sheetName, string vmName)
         {
@@ -114,7 +111,6 @@ namespace MngVm.BAL
 
             return _return;
         }
-
 
         public int GetVMRowIndex(string spreadsheetId, string sheetName, string vmName)
         {
@@ -177,6 +173,91 @@ namespace MngVm.BAL
                     }
 
                 }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return _return;
+        }
+
+        public int GetUserEmailRowIndex(string spreadsheetId, string sheetName, string emailID)
+        {
+            int _return = 0;
+
+            try
+            {
+
+                char UserEmailIDColRowIndex = Constant.Constant.UserEmailIdColumn[1];
+                char UserEmailIdColIndex = Constant.Constant.UserEmailIdColumn[0];
+                string vmCellRange = string.Concat(Constant.Constant.UserEmailIdColumn, ":", UserEmailIdColIndex);
+
+                string range = $"{ sheetName }!{vmCellRange}";
+
+                var getServerRequest = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                var getServerResponse = getServerRequest.Execute();
+                if (getServerResponse.IsNotNull() && getServerResponse.Values.IsNotNull() && getServerResponse.Values.Count > 0)
+                {
+                    int count = Convert.ToInt32(UserEmailIDColRowIndex.ToString())-1;
+                    foreach (var item in getServerResponse.Values)
+                    {
+                        count++;
+                        if (item.Count > 0 && item[0].Equals(emailID))
+                        {
+                            _return = count;
+                        }
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return _return;
+        }
+
+        public UserProfile GetUserVMDetail(string emailId)
+        {
+            UserProfile _return = null;
+
+            try
+            {
+                string spreadsheetId = Constant.Constant.UserSheetId;
+                string sheetName = Constant.Constant.UserSheetName;
+                string UserDefaultVmCol = Constant.Constant.UserDefaultVMColumn;
+                char UserDefaultVmColRowIndex = Constant.Constant.UserDefaultVMColumn[1];
+                char UserDefaultVmColIndex = Constant.Constant.UserDefaultVMColumn[0];
+
+                int searchedRowIndex = GetUserEmailRowIndex(spreadsheetId, sheetName, emailId);
+
+                if (searchedRowIndex > 0)
+                {
+                    List<string> machines = new List<string>(); ;
+                    string str = string.Empty;
+                    for (char colIndex = UserDefaultVmColIndex; colIndex <= 'Z'; colIndex++)
+                    {
+                        string cellName = string.Concat(colIndex, searchedRowIndex);
+                        object vmName = GetCellValue(spreadsheetId, sheetName, cellName);
+                        if (vmName.IsNull())
+                            break;
+                        machines.Add(Convert.ToString(vmName));
+                    }
+                    _return = new UserProfile()
+                    {
+                        machines = machines,
+                        rowId = searchedRowIndex,
+                        email=emailId
+                    };
+
+                  
+                }
+
             }
             catch (Exception ex)
             {
