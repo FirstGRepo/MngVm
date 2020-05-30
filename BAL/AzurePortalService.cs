@@ -58,16 +58,5 @@ namespace MngVm.BAL
             return _return;
         }
 
-        public bool StopVMByIDAsync(string vmId)
-        {
-            bool _return = false;
-            if (vmId.IsNotNullOrEmpty())
-            {
-                service.VirtualMachines.GetById(vmId).DeallocateAsync();
-                _return = true;
-            }
-
-            return _return;
-        }
     }
 }
