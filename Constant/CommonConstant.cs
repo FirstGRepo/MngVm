@@ -46,6 +46,22 @@ namespace MngVm.Constant
 
             return idleTime;
         }
+
+        public static string GetActualVMName(string SessionHostName)
+        {
+            string _return = string.Empty;
+
+            if (SessionHostName.IsNotNullOrEmpty())
+            {
+                var splitName = SessionHostName.Split(".");
+                if (splitName.Length > 0)
+                {
+                    _return = splitName[0];
+                }
+            }
+
+            return _return;
+        }
     }
 
     public static class ServerStatus

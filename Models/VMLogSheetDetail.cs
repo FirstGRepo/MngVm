@@ -8,11 +8,12 @@ namespace MngVm.Models
     public class VMLogSheetDetail
     {
         public int rowId { get; set; }
+        public string ResourceGroupName { get; set; }
         public string ServerName { get; set; }
         public string ServerStatus { get; set; }
-        public string ServerDateTime { get; set; }
+        public DateTime? ServerDateTime { get; set; }
         public string UserActiveStatus { get; set; }
-        public string UserActiveDateTime { get; set; }
+        public DateTime? UserActiveDateTime { get; set; }
     }
 
     public class VMLogAutoShut
