@@ -46,12 +46,12 @@ namespace MngVm.BAL
             return machine.PowerState;
         }
 
-        public bool StopVMByIDAsync(string vmId)
+        public bool StopVMByVmNameAsync(string groupName, string vmName)
         {
             bool _return = false;
-            if (vmId.IsNotNullOrEmpty())
+            if (groupName.IsNotNullOrEmpty() && vmName.IsNotNullOrEmpty())
             {
-                service.VirtualMachines.GetById(vmId).DeallocateAsync();
+                service.VirtualMachines.GetByResourceGroup(groupName, vmName).DeallocateAsync();
                 _return = true;
             }
 

@@ -254,6 +254,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="BAL\AzureGoogleProcess.cs" />
     <Compile Include="BAL\AzurePortalService.cs" />
     <Compile Include="BAL\GoogleService.cs" />
     <Compile Include="BAL\GoogleSheetService.cs" />
@@ -1043,6 +1044,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Credentials\azureauth.properties" />
     <Content Include="Credentials\googleauth.json" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

@@ -40,7 +40,7 @@ namespace MngVm.BAL
                         if (vmDetail.IsNotNull() && autoShutDetail.IsNotNull())
                         {
                             bool _onSheetUserActive = vmSheetDetail.UserActiveStatus.Contains(UserStatus.Active, StringComparison.OrdinalIgnoreCase);
-                            bool _onSheetServerActive = vmSheetDetail.UserActiveStatus.Contains(ServerStatus.Running, StringComparison.OrdinalIgnoreCase);
+                            bool _onSheetServerActive = vmSheetDetail.ServerStatus.Contains(ServerStatus.Running, StringComparison.OrdinalIgnoreCase);
 
                             if (isUserActive)
                             {
@@ -74,7 +74,7 @@ namespace MngVm.BAL
                                     if (autoShutDetail.LastUpdated.Value.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
                                     {
                                         //shutdown system with server status update to Stopped
-                                        azureService.StopVMByIDAsync(vmDetail.VMId);
+                                        azureService.StopVMByVmNameAsync(vmSheetDetail.ResourceGroupName, azureVMName);
                                         googleService.UpdateVmLogServerStatus(vmSheetDetail.rowId, ServerStatus.Stopped, true);
 
                                     }
@@ -126,7 +126,7 @@ namespace MngVm.BAL
                                     if (vmDetail.IsNotNull() && autoShutDetail.IsNotNull())
                                     {
                                         bool _onSheetUserActive = vmSheetDetail.UserActiveStatus.Contains(UserStatus.Active, StringComparison.OrdinalIgnoreCase);
-                                        bool _onSheetServerActive = vmSheetDetail.UserActiveStatus.Contains(ServerStatus.Running, StringComparison.OrdinalIgnoreCase);
+                                        bool _onSheetServerActive = vmSheetDetail.ServerStatus.Contains(ServerStatus.Running, StringComparison.OrdinalIgnoreCase);
 
 
                                         if (vmDetail.PowerState == PowerState.Deallocating
@@ -162,7 +162,7 @@ namespace MngVm.BAL
                                                 if (autoShutDetail.LastUpdated.Value.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
                                                 {
                                                     //shutdown system with server status update to Stopped
-                                                    azureService.StopVMByIDAsync(vmDetail.VMId);
+                                                    azureService.StopVMByVmNameAsync(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName);
                                                     googleService.UpdateVmLogServerStatus(vmSheetDetail.rowId, ServerStatus.Stopped, true);
 
                                                     if (_onSheetUserActive)

@@ -141,9 +141,9 @@ namespace MngVm.API
         public HttpResponseMessage ProcessVMScheduler(IList<RunCommandRequest> requestList)
         {
 
-            requestList = new List<RunCommandRequest>();
+           // requestList = new List<RunCommandRequest>();
 
-            GenerateDumbData(ref requestList);
+           // GenerateDumbData(ref requestList);
 
 
             if (requestList.IsNull() || requestList.Count == 0)
@@ -185,45 +185,45 @@ namespace MngVm.API
                 AdUserName = @"FWS\wvduser9",
                 LogonTime = DateTime.Now,
                 SessionId = "1",
-                State = "Active",
-                TenantName = "FWS Tenant"
-
-            });
-
-
-            requestList.Add(new RunCommandRequest()
-            {
-                SessionHostName = "OGUSWHP04VM-0.fws.local",
-                AdUserName = @"FWS\brandon.us",
-                LogonTime = DateTime.Now,
-                SessionId = "3",
-                State = "Active",
-                TenantName = "FWS Tenant"
-
-            });
-
-
-            requestList.Add(new RunCommandRequest()
-            {
-                SessionHostName = "OGUSWHP04VM-0.fws.local",
-                AdUserName = @"FWS\fwsadadmin",
-                LogonTime = DateTime.Now,
-                SessionId = "4",
                 State = "Disconnected",
                 TenantName = "FWS Tenant"
 
             });
 
 
-            requestList.Add(new RunCommandRequest()
-            {
-                SessionHostName = "OGUSWHP04VM-0.fws.local",
-                AdUserName = @"FWS\josh",
-                LogonTime = DateTime.Now,
-                SessionId = "6",
-                State = "Disconnected",
-                TenantName = "FWS Tenant"
-            });
+            //requestList.Add(new RunCommandRequest()
+            //{
+            //    SessionHostName = "OGUSWHP04VM-0.fws.local",
+            //    AdUserName = @"FWS\brandon.us",
+            //    LogonTime = DateTime.Now,
+            //    SessionId = "3",
+            //    State = "Active",
+            //    TenantName = "FWS Tenant"
+
+            //});
+
+
+            //requestList.Add(new RunCommandRequest()
+            //{
+            //    SessionHostName = "OGUSWHP04VM-0.fws.local",
+            //    AdUserName = @"FWS\fwsadadmin",
+            //    LogonTime = DateTime.Now,
+            //    SessionId = "4",
+            //    State = "Disconnected",
+            //    TenantName = "FWS Tenant"
+
+            //});
+
+
+            //requestList.Add(new RunCommandRequest()
+            //{
+            //    SessionHostName = "OGUSWHP04VM-0.fws.local",
+            //    AdUserName = @"FWS\josh",
+            //    LogonTime = DateTime.Now,
+            //    SessionId = "6",
+            //    State = "Disconnected",
+            //    TenantName = "FWS Tenant"
+            //});
         }
     }
 }

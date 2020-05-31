@@ -10,7 +10,7 @@ namespace MngVm.Constant
         public static readonly string GoogleAuthFilePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Credentials/googleauth.json");
         public static readonly string AzureAuthFilePath = System.Web.Hosting.HostingEnvironment.MapPath("~/Credentials/azureauth.properties");
 
-        public static readonly string DateTimeFormat = "dd-MM-yyyy HH:mm:ss";
+        public static readonly string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
         public static TimeSpan GetIdleTime(string value)
         {
