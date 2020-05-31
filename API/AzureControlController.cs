@@ -146,14 +146,14 @@ namespace MngVm.API
            // GenerateDumbData(ref requestList);
 
 
-            if (requestList.IsNull() || requestList.Count == 0)
+            if (requestList.IsNull())
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, MessageConstant.InsufficientRequestParameter);
             }
 
             var grpRequest = requestList.GroupBy(x => x.SessionHostName);
 
-            if (grpRequest.IsNotNull() && grpRequest.Count() > 0)
+            if (grpRequest.IsNotNull())
             {
                 foreach (var host in grpRequest)
                 {
