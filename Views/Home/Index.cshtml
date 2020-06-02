@@ -6,21 +6,23 @@
 
 <div class="row">
 
-    <h3>Welcome @Model.email</h3>@foreach (var machine in Model.machines)
+    <h3>Welcome @Model.email</h3>
+    @foreach (var machine in Model.machineInfo)
     {
         <div class="vmstatusdiv">
             <div class="pull-left ms-10">
                 Machine -
-                <span id="machine" class="status lblMachine" style="background:gray;">@machine</span>
+                <span id="machine" resourceGroup="@machine.Resource_Group" class="status lblMachine" style="background:gray;">@machine.MachineName</span>
             </div>
             <div class="pull-left">
                 Status -
                 <img class="loader" src="~/Content/images/loader.gif" style="image-rendering:pixelated; height:23px; width:62px;" />
-                <span id="@machine" class="status @machine" style="display:none;"></span>
+                <span id="@machine.MachineName" class="status @machine.MachineName" style="display:none;"></span>
             </div>
-            @*<div class="pull-left">
+
+            @*<div class="switchalign">
                 <span>OFF</span> <label class="switch">
-                    <input type="checkbox" id="handler">
+                    <input type="checkbox" id="handler" machineName="@machine.MachineName" resourceGroup="@machine.Resource_Group">
                     <span class="slider round"></span>
                 </label> <span>ON</span>
             </div>*@
@@ -35,15 +37,18 @@
         $('#handler').change(function () {
             debugger;
             var isOn = $(this).is(':checked');
+
             if (isOn) {
-                callAPI('@Url.Action("Start", "Home",null)')
+                callAPI('@Url.Action("Start", "Home",null)', $(this))
             } else {
-                callAPI('@Url.Action("Stop", "Home", null)');
+                callAPI('@Url.Action("Stop", "Home", null)', $(this));
             }
         });
     });
-    function callAPI(operation) {
-        var urlnew = operation
+    function callAPI(operation, element) {
+        var machinname = $(element).attr('machineName');
+        var resourceGrp = $(element).attr('resourceGroup');
+        var urlnew = operation + '?mahineName=' + machinname + '&resourceGrp=' + resourceGrp;
         $.ajax({
             type: "GET",
             url: urlnew,
@@ -63,10 +68,11 @@
 
     function getStatus(element) {
         var machinename = $(element).text();
+        var resourceGrp = $(element).attr('resourceGroup');
         var urlnew = '@Url.Action("GetStatus", "Home",null)';
         $.ajax({
             type: "GET",
-            url: urlnew + '?machineName=' + machinename,
+            url: urlnew + '?resourceGroupName=' + resourceGrp + '&machineName=' + machinename,
             dataType: 'json',
             contentType: "application/json; charset=utf-8",
             success: function (data) {
@@ -80,6 +86,8 @@
                     //$('#handler').prop('checked', true);
                     $('.' + machinename).addClass('on');
                 }
+                if (data.Value.indexOf('/') > 0)
+                    data.Value = data.Value.split('/')[1];
                 $('.' + machinename).text(data.Value == null ? 'Not Available' : data.Value).fadeIn();
             },
             error: function (textStatus, errorThrown) {

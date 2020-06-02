@@ -59,11 +59,10 @@ namespace MngVm.Models
             get;
             set;
         }
-        public List<string> machines
+        public List<MachineInfo> machineInfo
         {
             get;
             set;
         }
-
     }
 }

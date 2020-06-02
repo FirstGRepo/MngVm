@@ -26,13 +26,13 @@ namespace MngVm.Controllers
             if (!string.IsNullOrEmpty(username))
             {
                 UserProfile user = _gService.GetUserVMDetail(username);
-                if (user.IsNotNull() && user.machines.Count > 0)
+                if (user.IsNotNull() && user.machineInfo.Count > 0)
                 {
-                    foreach (var vmName in user.machines)
+                    foreach (var vm in user.machineInfo)
                     {
-                        var powerState = _azService.GetVMStatus(Constant.Constant.resourceGroupName, vmName);
+                        var powerState = _azService.GetVMStatus(vm.Resource_Group, vm.MachineName);
                         if (powerState != null && powerState.Value.Contains("deallocat"))
-                            _azService.Start(Constant.Constant.resourceGroupName, vmName);
+                            _azService.Start(vm.Resource_Group, vm.MachineName);
                     }
                     return View(user);
                 }
@@ -43,18 +43,18 @@ namespace MngVm.Controllers
                 return Content(MessageConstant.LoginUrl);
         }
 
-        public ActionResult GetStatus(string machineName)
+        public ActionResult GetStatus(string resourceGroupName, string machineName)
         {
-            var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, machineName);
+            var retVal = _azService.GetVMStatus(resourceGroupName, machineName);
             return Json(retVal, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Start()
+        public ActionResult Start(string machineName,string resourceGrp)
         {
             string username = Convert.ToString(Session["username"]);
             UserProfile user = _gService.GetUserVMDetail(username);
-            _azService.Start(Constant.Constant.resourceGroupName, user.machines[0]);
-            var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, user.machines[0]);
+            _azService.Start(resourceGrp, machineName);
+            var retVal = _azService.GetVMStatus(resourceGrp, machineName);
             return Json(retVal, JsonRequestBehavior.AllowGet);
         }
 
