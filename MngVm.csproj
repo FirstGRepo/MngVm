@@ -1025,6 +1025,7 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
+    <Compile Include="Models\MachineInfo.cs" />
     <Compile Include="Models\TokenModel.cs" />
     <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Models\RunCommandRequest.cs" />
@@ -1036,6 +1037,9 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\google.png" />
+    <Content Include="Content\images\google2.JPG" />
+    <Content Include="Content\images\loader.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

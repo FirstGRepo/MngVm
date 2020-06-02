@@ -237,38 +237,39 @@ namespace MngVm.BAL
                 string UserDefaultVmCol = Constant.Constant.UserDefaultVMColumn;
                 char UserDefaultVmColRowIndex = Constant.Constant.UserDefaultVMColumn[1];
                 char UserDefaultVmColIndex = Constant.Constant.UserDefaultVMColumn[0];
-
+                char UserResourceGroupColIndex = Constant.Constant.UserResourceGroupColumn[0];
                 int searchedRowIndex = GetUserEmailRowIndex(spreadsheetId, sheetName, emailId);
 
                 if (searchedRowIndex > 0)
                 {
-                    List<string> machines = new List<string>(); ;
-                    string str = string.Empty;
+                    List<MachineInfo> lstMachineInfo = new List<MachineInfo>();
+
                     for (char colIndex = UserDefaultVmColIndex; colIndex <= 'Z'; colIndex++)
                     {
+                        MachineInfo machine = new MachineInfo();
                         string cellName = string.Concat(colIndex, searchedRowIndex);
-                        object vmName = GetCellValue(spreadsheetId, sheetName, cellName);
-                        if (vmName.IsNull())
-                            break;
-                        machines.Add(Convert.ToString(vmName));
+                        string vmName = Convert.ToString(GetCellValue(spreadsheetId, sheetName, cellName));
+                        if (vmName.Contains(Constant.Constant.SplitChar))
+                        {
+                            string[] machineInfo = Convert.ToString(vmName).Split(Constant.Constant.SplitChar.ToChar());
+                            machine.MachineName = machineInfo[0].Trim();
+                            machine.Resource_Group = machineInfo[1].Trim();
+                            lstMachineInfo.Add(machine);
+                            if (vmName.IsNull())
+                                break;
+                        }
                     }
                     _return = new UserProfile()
                     {
-                        machines = machines,
-                        rowId = searchedRowIndex,
-                        email = emailId
+                        email=emailId,
+                        machineInfo = lstMachineInfo
                     };
-
-
                 }
-
             }
             catch (Exception ex)
             {
 
             }
-
-
             return _return;
         }
 
