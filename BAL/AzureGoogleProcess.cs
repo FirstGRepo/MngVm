@@ -72,7 +72,7 @@ namespace MngVm.BAL
                                     DateTime? latestTime = vmSheetDetail.ServerDateTime > vmSheetDetail.UserActiveDateTime ? vmSheetDetail.ServerDateTime : vmSheetDetail.UserActiveDateTime;
 
                                     //if (autoShutDetail.LastUpdated.Value.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
-                                    if (DateTime.Now.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
+                                    if (DateTime.Now.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime && autoShutDetail.AutoShutTime != new TimeSpan(0, 0, 0, 0))
                                     {
                                         //shutdown system with server status update to Stopped
                                         azureService.StopVMByVmNameAsync(vmSheetDetail.ResourceGroupName, azureVMName);
@@ -161,7 +161,7 @@ namespace MngVm.BAL
                                                 DateTime? latestTime = vmSheetDetail.ServerDateTime > vmSheetDetail.UserActiveDateTime ? vmSheetDetail.ServerDateTime : vmSheetDetail.UserActiveDateTime;
 
                                                 //if (autoShutDetail.LastUpdated.Value.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
-                                                if (DateTime.Now.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime)
+                                                if (DateTime.Now.Subtract(latestTime.Value) >= autoShutDetail.AutoShutTime && autoShutDetail.AutoShutTime != new TimeSpan(0, 0, 0, 0))
                                                 {
                                                     //shutdown system with server status update to Stopped
                                                     azureService.StopVMByVmNameAsync(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName);
