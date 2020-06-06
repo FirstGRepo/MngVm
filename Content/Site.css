@@ -107,7 +107,7 @@ input:checked + .slider:before {
 }
 
 .vmstatusdiv {
-    position:relative;
+    position: relative;
     padding: 10px;
     border: 1px solid;
     margin: 30px 0;
@@ -135,4 +135,21 @@ input:checked + .slider:before {
     position: absolute;
     right: 15px;
     bottom: -1%;
+}
+
+footer {
+    position: absolute;
+    bottom: 50px;
+    text-align: center;
+    left: 0;
+    right: 0;
+}
+
+.vmError {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 38%;
+    color: red;
+    text-align: center;
 }

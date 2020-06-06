@@ -49,7 +49,7 @@ namespace MngVm.Controllers
             return Json(retVal, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Start(string machineName,string resourceGrp)
+        public ActionResult Start(string machineName, string resourceGrp)
         {
             string username = Convert.ToString(Session["username"]);
             UserProfile user = _gService.GetUserVMDetail(username);
@@ -78,16 +78,24 @@ namespace MngVm.Controllers
                 return Content("Email not found");
             else
             {
-                if (Constant.Constant.IsProduction)
+                if (Constant.Constant.IsAdmin(userinfo.email))
                 {
-                    if (userinfo.email.Contains("@organizedgains.com"))
-                        return RedirectToAction("index");
-                    else
-                        return Redirect(GoogleContants.ExternalRedirection);
+                    Session["isAdmin"] = true;
+                    return RedirectToAction("index", "Admin");
                 }
                 else
                 {
-                    return RedirectToAction("index");
+                    if (Constant.Constant.IsProduction)
+                    {
+                        if (userinfo.email.Contains("@organizedgains.com"))
+                            return RedirectToAction("index");
+                        else
+                            return Redirect(GoogleContants.ExternalRedirection);
+                    }
+                    else
+                    {
+                        return RedirectToAction("index");
+                    }
                 }
             }
         }

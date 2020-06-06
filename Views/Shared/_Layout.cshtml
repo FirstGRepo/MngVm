@@ -6,9 +6,8 @@
     <title>@ViewBag.Title </title>
     <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <script src="~/Scripts/modernizr-2.6.2.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    @*<link href="~/Content/font-awesome.min.css" rel="stylesheet" />*@
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -23,20 +22,25 @@
                 <a class="navbar-brand" href="#">work.organizedgains.com</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav"></ul>
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                    @if (Session["isAdmin"].IsNotNull())
+                    {
+                        <li><a href="@Url.Action("Index","Admin")">Users</a></li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
 
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer class="text-center">
+        <footer>
+            <hr />
             <p>&copy; @DateTime.Now.Year - work.organizedgains.com</p>
         </footer>
     </div>
 
-    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>
