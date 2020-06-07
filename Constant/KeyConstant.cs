@@ -11,12 +11,14 @@ namespace MngVm.Constant
 
     }
 
-    public  class AzureVMLogger
+    public class AzureVMLogger
     {
         public string VMLogSpreadSheetID => ConfigurationManager.AppSettings["azvmVMLogSpreadSheetID"];
         public string VMLogSheetName => ConfigurationManager.AppSettings["azvmVMLogSheetName"];
         public string AutoShutTime => ConfigurationManager.AppSettings["azvmAutoShutTime"];
         public string LastSheetUpdated => ConfigurationManager.AppSettings["azvmLastSheetUpdated"];
+
+        public string ResourceGroupColumn => ConfigurationManager.AppSettings["azvmResourceGroupColumn"];
         public string UserActiveColumn => ConfigurationManager.AppSettings["azvmUserActiveColumn"];
         public string UserActiveDateTimeColumn => ConfigurationManager.AppSettings["azvmUserActiveDateTimeColumn"];
         public string ServerColumn => ConfigurationManager.AppSettings["azvmServerColumn"];

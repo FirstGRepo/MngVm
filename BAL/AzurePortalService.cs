@@ -45,5 +45,18 @@ namespace MngVm.BAL
             IVirtualMachine machine = GetVM(groupName,vmName);
             return machine.PowerState;
         }
+
+        public bool StopVMByVmNameAsync(string groupName, string vmName)
+        {
+            bool _return = false;
+            if (groupName.IsNotNullOrEmpty() && vmName.IsNotNullOrEmpty())
+            {
+                service.VirtualMachines.GetByResourceGroup(groupName, vmName).DeallocateAsync();
+                _return = true;
+            }
+
+            return _return;
+        }
+
     }
 }
