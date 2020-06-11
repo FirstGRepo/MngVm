@@ -37,7 +37,10 @@ namespace MngVm.Controllers
                     return View(user);
                 }
                 else
+                {
+                    Session.Abandon();
                     return Content(MessageConstant.NoMachineFound);
+                }
             }
             else
                 return Content(MessageConstant.LoginUrl);
@@ -98,6 +101,12 @@ namespace MngVm.Controllers
                     }
                 }
             }
+        }
+
+        public ActionResult SignOut()
+        {
+            Session.Abandon();
+            return RedirectToAction("Index", "GoogleControl");
         }
     }
 }

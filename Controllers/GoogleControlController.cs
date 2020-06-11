@@ -18,9 +18,13 @@ namespace MngVm.Controllers
         public ActionResult Index()
         {
             if (Session["username"].IsNull())
-                return View();
+                return View("MainSite");
             else
                 return RedirectToAction("Index", "Home");
+        }
+        public ActionResult MainSite()
+        {
+            return View();
         }
         public ActionResult RedirectToGoogle()
         {
