@@ -20,6 +20,13 @@ namespace MngVm.Controllers
             _azService = new AzurePortalService();
         }
 
+        public ActionResult getUser()
+        {
+
+            return null;
+        }
+
+       
         public ActionResult Index()
         {
             string username = Convert.ToString(Session["username"]);
@@ -39,7 +46,8 @@ namespace MngVm.Controllers
                 else
                 {
                     Session.Abandon();
-                    return Content(MessageConstant.NoMachineFound);
+                    return Redirect(GoogleContants.ExternalRedirection);
+                    // return Content(MessageConstant.NoMachineFound);
                 }
             }
             else
@@ -90,10 +98,10 @@ namespace MngVm.Controllers
                 {
                     if (Constant.Constant.IsProduction)
                     {
-                        if (userinfo.email.Contains("@organizedgains.com"))
-                            return RedirectToAction("index");
-                        else
-                            return Redirect(GoogleContants.ExternalRedirection);
+                        //if (userinfo.email.Contains("@organizedgains.com"))
+                        return RedirectToAction("index");
+                        //else
+                        //    return Redirect(GoogleContants.ExternalRedirection);
                     }
                     else
                     {
@@ -107,6 +115,11 @@ namespace MngVm.Controllers
         {
             Session.Abandon();
             return RedirectToAction("Index", "GoogleControl");
+        }
+
+        public ActionResult Unauthorize()
+        {
+            return View();
         }
     }
 }
