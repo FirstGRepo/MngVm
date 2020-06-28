@@ -4,9 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title </title>
-    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    @*@Styles.Render("~/Content/css")*@
+
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
@@ -19,7 +21,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 @*@Html.ActionLink("work.organizedgains.com", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
-                <a class="navbar-brand" href="#">work.organizedgains.com</a>
+                <a class="navbar-brand" href="#">Organized Gains Workspace </a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -29,20 +31,24 @@
                         <li><a href="@Url.Action("Index","Admin")">Users</a></li>
                     }
                 </ul>
+                <ul class="nav navbar-nav" style="float:right !important">
+                    <li class="text-right"><a href="@Url.Action("SignOut","Home")">SignOut</a></li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <div class="container body-content">
+    <div class="container body-content" style="min-height:77vh;">
         @RenderBody()
-        <footer>
-            <hr />
-            <p>&copy; @DateTime.Now.Year - work.organizedgains.com</p>
-        </footer>
     </div>
+    <footer>
+        <hr />
+        <p>&copy; @DateTime.Now.Year - work.organizedgains.com</p>
+    </footer>
 
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/Admin/Admin.js"></script>
+    @*@Styles.Render("~/bundles/Admin")*@
 </body>
 </html>
 <script>

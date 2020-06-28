@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using MngVm.Constant;
+using System.Linq;
 
 namespace MngVm.Controllers
 {
@@ -19,15 +20,24 @@ namespace MngVm.Controllers
 
         public ActionResult Index()
         {
-            throw new Exception();
+            PowerShellCommand powershell = new PowerShellCommand();
             if (LDAPContants.LDAPOU.Contains(","))
                 ViewBag.OuList = new SelectList(LDAPContants.LDAPOU.Split(","));
             else
                 ViewBag.OuList = new SelectList(LDAPContants.LDAPOU);
+
             if (_ldapService.GetUPNSuffixes().IsNotNull() && _ldapService.GetUPNSuffixes().Count > 0)
                 ViewBag.Upn = new SelectList(_ldapService.GetUPNSuffixes());
             else
                 ViewBag.Upn = new string[] { string.Empty };
+
+            var items = powershell.getHostPools();
+
+            if (items.IsNotNull() && items.Count() > 0)
+                ViewBag.HostpoolList = new SelectList(items);
+            else
+                ViewBag.HostpoolList = new string[] { string.Empty };
+
             return View();
         }
 
@@ -54,9 +64,29 @@ namespace MngVm.Controllers
         [HttpPost]
         public ActionResult Delete(string userName)
         {
-
             var isAdded = _ldapService.DeleteUser(userName);
             return Json(isAdded, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ChangePassword(string username)
+        {
+            User user = new User { UserName = username };
+            return View(user);
+        }
+        [HttpPost]
+        public ActionResult ChangePassword(User user)
+        {
+            var isAdded = _ldapService.ChangePassword(user);
+            //ViewBag.Message = isAdded ? "Password has been changed successfuly" : "Something went wrong";
+            //return View();
+            return Json(isAdded, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetVmsByHostpool(string hostPool)
+        {
+            PowerShellCommand powershell = new PowerShellCommand();
+            var items = powershell.getVmList(hostPool);
+            return Json(items, JsonRequestBehavior.AllowGet);
         }
 
     }

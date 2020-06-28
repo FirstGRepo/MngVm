@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace MngVm.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         GoogleSheetService _gService = null;
         AzurePortalService _azService = null;
@@ -20,13 +20,6 @@ namespace MngVm.Controllers
             _azService = new AzurePortalService();
         }
 
-        public ActionResult getUser()
-        {
-
-            return null;
-        }
-
-       
         public ActionResult Index()
         {
             string username = Convert.ToString(Session["username"]);
@@ -35,12 +28,12 @@ namespace MngVm.Controllers
                 UserProfile user = _gService.GetUserVMDetail(username);
                 if (user.IsNotNull() && user.machineInfo.Count > 0)
                 {
-                    foreach (var vm in user.machineInfo)
-                    {
-                        var powerState = _azService.GetVMStatus(vm.Resource_Group, vm.MachineName);
-                        if (powerState != null && powerState.Value.Contains("deallocat"))
-                            _azService.Start(vm.Resource_Group, vm.MachineName);
-                    }
+                    //foreach (var vm in user.machineInfo)
+                    //{
+                    //    var powerState = _azService.GetVMStatus(vm.Resource_Group, vm.MachineName);
+                    //    if (powerState != null && powerState.Value.Contains("deallocat"))
+                    //        _azService.Start(vm.Resource_Group, vm.MachineName);
+                    //}
                     return View(user);
                 }
                 else
@@ -57,26 +50,30 @@ namespace MngVm.Controllers
         public ActionResult GetStatus(string resourceGroupName, string machineName)
         {
             var retVal = _azService.GetVMStatus(resourceGroupName, machineName);
-            return Json(retVal, JsonRequestBehavior.AllowGet);
+            return Json(Convert.ToString(retVal), JsonRequestBehavior.AllowGet);
         }
+
+        //public ActionResult Start(string machineName, string resourceGrp)
+        //{
+        //    _azService.Start(resourceGrp, machineName);
+        //    var retVal = _azService.GetVMStatus(resourceGrp, machineName);
+        //    return Json(Convert.ToString(retVal), JsonRequestBehavior.AllowGet);
+        //}
 
         public ActionResult Start(string machineName, string resourceGrp)
         {
-            string username = Convert.ToString(Session["username"]);
-            UserProfile user = _gService.GetUserVMDetail(username);
-            _azService.Start(resourceGrp, machineName);
-            var retVal = _azService.GetVMStatus(resourceGrp, machineName);
-            return Json(retVal, JsonRequestBehavior.AllowGet);
+            var powerState = _azService.GetVMStatus(resourceGrp, machineName);
+            if (powerState != null && powerState.Value.Contains("deallocat"))
+                _azService.Start(resourceGrp, machineName);
+            return Json("Starting", JsonRequestBehavior.AllowGet);
         }
 
-        //public ActionResult Stop()
-        //{
-        //    string username = Convert.ToString(Session["username"]);
-        //    UserProfile user = _gService.GetUserVMDetail(username);
-        //    _azService.Deallocate(Constant.Constant.resourceGroupName, user.machines[0]);
-        //    var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, user.machines[0]);
-        //    return Json(retVal, JsonRequestBehavior.AllowGet);
-        //}
+        public ActionResult Stop(string machineName, string resourceGrp)
+        {
+            _azService.Stop(resourceGrp, machineName);
+            //var retVal = _azService.GetVMStatus(resourceGrp, machineName);
+            return Json("Deallocating", JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult Success()
         {

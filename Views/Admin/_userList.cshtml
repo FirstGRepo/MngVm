@@ -17,6 +17,7 @@
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>User Name</th>
+                            <th>HostPool</th>
                             <th>OU</th>
                             <th>Action</th>
                         </tr>
@@ -29,10 +30,11 @@
                                 <td>@user.FirstName</td>
                                 <td>@user.LastName</td>
                                 <td>@user.UserName</td>
+                                <td>@user.HostPoolName</td>
                                 <td>@user.Ou</td>
                                 <td>
-                                    <button title="Change Password" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn"><i class="fa fa-lock"></i></button>
-                                    <button title="Delete User" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn btnDelete"><i class="fa fa-trash"></i></button>
+                                    <a href="/Admin/ChangePassword?userName=@user.UserName" title="Change Password" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn custmButton btnchngpas"><i class="fa fa-lock"></i></a>
+                                    <button title="Delete User" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn custmButton btnDelete"><i class="fa fa-trash"></i></button>
                                 </td>
                             </tr>
                         }

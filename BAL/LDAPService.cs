@@ -2,16 +2,13 @@
 using System.DirectoryServices;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Security.Principal;
 using System.Threading;
 using System.Globalization;
 using System.Collections;
 using MngVm.Models;
-using Microsoft.Azure.Management.KeyVault.Fluent;
 using MngVm.Constant;
 using System.DirectoryServices.AccountManagement;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.DirectoryServices.ActiveDirectory;
 
 namespace MngVm.BAL
@@ -59,7 +56,8 @@ namespace MngVm.BAL
             SearchResultCollection results;
             DirectorySearcher ds = null;
 
-            List<User> userList = new List<User>(); ;
+            List<User> userList = new List<User>();
+            List<User> newUserList = new List<User>();
             string[] ouArr = LDAPContants.LDAPOU.Split(",");
             foreach (var ou in ouArr)
             {
@@ -83,9 +81,24 @@ namespace MngVm.BAL
                         };
                         userList.Add(user);
                     }
+                    PowerShellCommand powershell = new PowerShellCommand();
+                    var userVmsList = powershell.getUserVmList();
+                    newUserList = (from ui in userList
+                                   join uvm in userVmsList on ui.UserName equals uvm.UserName into tuvm
+                                   from uvm in tuvm.DefaultIfEmpty()
+                                   select new User()
+                                   {
+                                       FirstName = ui.FirstName,
+                                       LastName = ui.LastName,
+                                       UserName = ui.UserName,
+                                       Ou=ui.Ou,
+                                       HostPoolName = uvm?.HostPoolName
+                                   }).ToList();
+
+
                 }
             }
-            return userList;
+            return newUserList;
         }
 
         public string CreateNewUser(User user)
@@ -123,16 +136,23 @@ namespace MngVm.BAL
                     PrincipalContext domainContext = new PrincipalContext(ContextType.Domain, stringDomainName, "OU=" + user.Ou + ";DC=" + domain1Name + ";DC=" + domain2Name);
                     UserPrincipal newUser = new UserPrincipal(domainContext)
                     {
-                        UserPrincipalName = user.UserName + "@" + user.UPNSuffix,
+                        UserPrincipalName = user.UserName + user.UPNSuffix,
                         SamAccountName = user.UserName.Length > 20 ? user.UserName.Substring(0, 20) : user.UserName,
-                        Name = user.FirstName,
+                        Name = user.FirstName + " " + user.LastName, // full name
                         GivenName = user.FirstName,
                         Surname = user.LastName,
+                        DisplayName = user.FirstName + " " + user.LastName,
+                        UserCannotChangePassword = false,
                         PasswordNeverExpires = true,
                         Enabled = true,
                     };
                     newUser.SetPassword(user.Password);
                     newUser.Save();
+
+                    // Run powershell command to assign VM
+                    //PowerShellCommand power = new PowerShellCommand();
+                    //power.AssignMachine(user.HostpoolName, user.UserName);
+
                     retVal = "1|User Added Successfuly";
                 }
                 else
@@ -284,7 +304,7 @@ namespace MngVm.BAL
 
         }
 
-        public bool ChnagePassword(string username, string password)
+        public bool ChangePassword(User usr)
         {
             //using (PrincipalContext pc = new PrincipalContext(contextType, domain))
             //{
@@ -300,10 +320,10 @@ namespace MngVm.BAL
 
             bool retval = false;
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, username);
+            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, usr.UserName);
             if (user != null)
             {
-                user.SetPassword(password);
+                user.SetPassword(usr.Password);
                 retval = true;
             }
             return retval;
@@ -361,18 +381,20 @@ namespace MngVm.BAL
             //return suffixes;
 
             List<string> suffixList = new List<string>();
-            suffixList.Add(Domain.GetCurrentDomain().Name);
+            suffixList.Add("@" + Domain.GetCurrentDomain().Name);
             DirectoryEntry rootDSE = new DirectoryEntry("LDAP://RootDSE");
             string context = rootDSE.Properties["configurationNamingContext"].Value.ToString();
             DirectoryEntry partition = new DirectoryEntry(@"LDAP://CN=Partitions," + context);
 
             foreach (string suffix in partition.Properties["uPNSuffixes"])
             {
-                suffixList.Add(suffix);
+                suffixList.Add("@" + suffix);
             }
 
             return suffixList;
         }
+
+
     }
 
 }

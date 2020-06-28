@@ -23,6 +23,7 @@ namespace MngVm.Models
         public string title { get; set; }
         public string c { get; set; }
         public string Ou { get; set; }
-
+        public string HostPoolName { get; set; }
+        public string VmName { get; set; }
     }
 }

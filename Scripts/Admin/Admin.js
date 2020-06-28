@@ -1,4 +1,6 @@
-﻿$(function () {
+﻿
+var array=[1,2,3,4,5,6,7,8,9]
+$(function () {
 
 })
 
@@ -110,12 +112,81 @@ $('#Password').focusout(function () {
     }
 })
 
-//$('#UserName').focusout(function () {
-//    if ($(this).val().trim() != '') {
-//        if (!validateEmail($(this).val())) {
-//            $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(5000);
-//            $('#message').text('Please enter valid username');
-//            (this).val('')
-//        }
-//    }
-//})
+$('#UserName').focusout(function () {
+    if ($(this).val().trim() != '') {
+        if (validateEmail($(this).val())) {
+            $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(5000);
+            $('#message').text('Please enter valid username');
+            (this).val('')
+        }
+    }
+})
+
+$('#chngpasBtn').click(function (e) {
+    e.preventDefault();
+    if ($('#Password').val().trim() == $('#confPassword').val().trim()) {
+        //  $('#frmChangePass').submit();
+        var Data = $('#frmChangePass').serializeArray();
+        $.ajax({
+            url: '/Admin/ChangePassword',
+            type: 'POST',
+            data: Data,
+            dataType: 'json',
+            success: function (data) {
+                $('#message').text('');
+                if (data) {
+                    $('#frmChangePass input').val('');
+                    //  $('#Password,#confPassword').val('');
+                    $('#message').text('Password has been changed successfuly.').addClass('green');
+                }
+                else
+                    $('#message').text('Error while udating password.').addClass('red');
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+                //  $('#success-alert').addClass('alert-danger');
+            }
+        });
+    }
+    else {
+        $('#Password,#confPassword').addClass('requiredBorder');
+        alert('Password does not matched.');
+    }
+})
+
+$('#HostPoolName').change(function (e) {
+    e.preventDefault();
+    if ($(this).val().trim() != '') {
+        var hostpoolName = $(this).val();
+
+        $.ajax({
+            url: '/Admin/GetVmsByHostpool',
+            type: 'GET',
+            data: { hostPool: hostpoolName },
+            dataType: 'json',
+            success: function (data) {
+                $('#message').text('');
+                if (data) {
+                    $('#vmlist').empty();
+                    var list = '<li class="list-group-item active text-center">Machines</li>';
+                    $.each(data, function (i, v) {
+                        list += '<li class="list-group-item">' + v + '</li>';
+                    });
+
+                    $('#vmlist').append(list);
+                    $('#messageSection').show();
+                }
+                else
+                    $('#message').text('Error while getting Vm info.').addClass('red');
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+                //  $('#success-alert').addClass('alert-danger');
+            }
+        });
+    }
+    //else {
+    //    $('#Password,#confPassword').addClass('requiredBorder');
+    //    alert('Password does not matched.');
+    //}
+})

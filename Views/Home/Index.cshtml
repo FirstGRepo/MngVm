@@ -6,26 +6,28 @@
 
 <div class="row">
 
-    <h3>Welcome @Model.email</h3>
+    <h3 class="welcome">Welcome @Model.email</h3>
     @foreach (var machine in Model.machineInfo)
     {
         <div class="vmstatusdiv">
             <div class="pull-left ms-10">
-                Machine 
-                <span id="machine" resourceGroup="@machine.Resource_Group" class="status lblMachine" style="background:gray;">@machine.MachineName</span>
+                Machine
+                <span id="machine" resourceGroup="@machine.Resource_Group" machineName="@machine.MachineName" class="status lblMachine" style="background:gray;">@machine.MachineName</span>
             </div>
             <div class="pull-left">
-                Status 
+                Current Status
                 <img class="loader" src="~/Content/images/loader.gif" style="image-rendering:pixelated; height:23px; width:62px;" />
                 <span id="@machine.MachineName" class="status @machine.MachineName" style="display:none;"></span>
             </div>
-
+            <div class="text-center">
+                <span class="notice text-center">Updating current status, it may take some time.</span>
+            </div>
             @*<div class="switchalign">
-                <span>OFF</span> <label class="switch">
-                    <input type="checkbox" id="handler" machineName="@machine.MachineName" resourceGroup="@machine.Resource_Group">
-                    <span class="slider round"></span>
-                </label> <span>ON</span>
-            </div>*@
+                    <span>OFF</span> <label class="switch">
+                        <input checked="checked" type="checkbox" id="handler" machineName="@machine.MachineName" resourceGroup="@machine.Resource_Group">
+                        <span class="slider round"></span>
+                    </label> <span>ON</span>
+                </div>*@
         </div>
     }
 </div>
@@ -33,8 +35,9 @@
 @*<script src="~/scripts/VM/operateVm.js"></script>*@
 
 <script>
+
     $(document).ready(function () {
-        $('#handler').change(function () {
+        @*$('#handler').change(function () {
             debugger;
             var isOn = $(this).is(':checked');
 
@@ -43,12 +46,13 @@
             } else {
                 callAPI('@Url.Action("Stop", "Home", null)', $(this));
             }
-        });
+        });*@
     });
+
     function callAPI(operation, element) {
         var machinname = $(element).attr('machineName');
         var resourceGrp = $(element).attr('resourceGroup');
-        var urlnew = operation + '?mahineName=' + machinname + '&resourceGrp=' + resourceGrp;
+        var urlnew = operation + '?machineName=' + machinname + '&resourceGrp=' + resourceGrp;
         $.ajax({
             type: "GET",
             url: urlnew,
@@ -56,18 +60,27 @@
             contentType: "application/json; charset=utf-8",
             success: function (data) {
                 Success = data;
-                getStatus();
+                //getStatus();
+            },
+            complete: function () {
+                //getStatus(element);
             },
             error: function (textStatus, errorThrown) {
                 debugger;
                 //$('#handler').prop('checked', false)
-                alert(textStatus.responseJSON.error.message);
+                //alert(textStatus.responseJSON.error.message);
+                alert("Error - " + textStatus);
             }
         });
+        //$('.lblMachine').each(function () {
+        //    callAPI(operation, element)
+        //    //getStatus($(this));
+        //})
     }
 
     function getStatus(element) {
-        var machinename = $(element).text();
+        //debugger;
+        var machinename = $(element).attr('machineName');
         var resourceGrp = $(element).attr('resourceGroup');
         var urlnew = '@Url.Action("GetStatus", "Home",null)';
         $.ajax({
@@ -78,29 +91,48 @@
             success: function (data) {
                 debugger;
                 $('.' + machinename).prev().hide();
-                if (data.Value == null || data.Value.indexOf('deallocat') > 0) {
+                if (data == null || data.indexOf('deallocat') > 0) {
                     //$('#handler').prop('checked', false);
-                    $('.' + machinename).addClass('off');
+                    $('.' + machinename).removeClass('on').addClass('off');
+                    $('.notice').fadeIn();
                 }
                 else {
                     //$('#handler').prop('checked', true);
-                    $('.' + machinename).addClass('on');
+                    $('.' + machinename).removeClass('off').addClass('on');
+                    $('.notice').fadeOut();
+                    if (data.indexOf('running') > 0) {
+                        clearInterval(interval);
+                    }
                 }
-                if (data.Value.indexOf('/') > 0)
-                    data.Value = data.Value.split('/')[1];
-                $('.' + machinename).text(data.Value == null ? 'Not Available' : data.Value).fadeIn();
+                //debugger;
+                if (data.indexOf('/') > 0)
+                    data = data.split('/')[1];
+                $('.' + machinename).text(data == null ? 'Not Available' : data).fadeIn();
             },
             error: function (textStatus, errorThrown) {
                 debugger;
-                //  $('#handler').prop('checked', false)
-                alert(textStatus.responseJSON.error.message);
-            }
+                //$('#handler').prop('checked', false)
+                //alert(textStatus.responseJSON.error.message);
+                alert("Error - " +textStatus);
+            },
         });
     }
 
     $(window).on('load', function () {
-        $('.lblMachine').each(function () {
-            getStatus($(this));
-        })
+
+        setTimeout(function () {
+            $('.lblMachine').each(function () {
+                //getStatus($(this));
+                callAPI('@Url.Action("Start", "Home",null)', $(this))
+            })
+        }, 8000);
+
+        interval=  setInterval(function () {
+             $('.lblMachine').each(function () {
+                getStatus($(this));
+            })
+        }, 5000);
+
     });
+
 </script>

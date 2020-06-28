@@ -176,6 +176,9 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\System.Management.Automation.dll.10.0.10586.0\lib\net40\System.Management.Automation.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.Serialization" />
@@ -261,6 +264,7 @@
     <Compile Include="BAL\GoogleService.cs" />
     <Compile Include="BAL\GoogleSheetService.cs" />
     <Compile Include="BAL\LDAPService.cs" />
+    <Compile Include="BAL\PowerShellCommand.cs" />
     <Compile Include="Constant\CommonConstant.cs" />
     <Compile Include="Constant\KeyConstant.cs" />
     <Compile Include="Constant\LDAPContants.cs" />
@@ -1032,6 +1036,7 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
+    <Compile Include="Models\HostPoolVms.cs" />
     <Compile Include="Models\MachineInfo.cs" />
     <Compile Include="Models\TokenModel.cs" />
     <Compile Include="Models\User.cs" />
@@ -1176,6 +1181,10 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="PoweshellScripts\AssignVm.ps1" />
+    <Content Include="PoweshellScripts\GetRdsUserNames.ps1" />
+    <Content Include="PoweshellScripts\GetVms.ps1" />
+    <Content Include="PoweshellScripts\test.ps1" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\MngVM.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
@@ -1208,6 +1217,7 @@
     <Content Include="Views\GoogleControl\MainSite.cshtml" />
     <Content Include="Views\Admin\_userList.cshtml" />
     <Content Include="Views\Home\Unauthorize.cshtml" />
+    <Content Include="Views\Admin\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
