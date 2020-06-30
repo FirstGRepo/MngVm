@@ -1164,6 +1164,7 @@
     <Content Include="Content\images\google.png" />
     <Content Include="Content\images\google2.JPG" />
     <Content Include="Content\images\loader.gif" />
+    <Content Include="Content\images\spinner.gif" />
     <Content Include="Content\MainSite.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />

@@ -111,7 +111,8 @@ namespace MngVm.Controllers
         public ActionResult SignOut()
         {
             Session.Abandon();
-            return RedirectToAction("Index", "GoogleControl");
+            //return RedirectToAction("Index", "GoogleControl");
+            return RedirectPermanent("https://www.google.com/accounts/Logout");
         }
 
         public ActionResult Unauthorize()

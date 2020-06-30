@@ -220,14 +220,14 @@ footer {
 
 
 #messageSection {
-    padding:2px;
+    padding: 2px;
     border-radius: .1875em;
     z-index: 5;
     position: absolute;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 4px 2px -2px rgba(0, 0, 0, 0.2), 0 0 1px 1px rgba(0, 0, 0, 0.15);
     background-color: #dfeaf6;
     width: 280px;
-   /* height: 80px;*/
+    /* height: 80px;*/
     left: 300px;
     top: 0px;
 }
@@ -249,4 +249,23 @@ footer {
         border-right: 15px solid #CECECE;
         top: 13px;
         left: -15px;
+    }
+
+#loader {
+    z-index: 50;
+    height:100%;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    background: #dddddd5e;
+    top: 0;
+    bottom: 18%;
+}
+
+    #loader img {
+        position: absolute;
+        left: 44%;
+        top: 38%;
+        height: 200px;
+        width: 200px;
     }

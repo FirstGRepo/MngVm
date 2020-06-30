@@ -62,9 +62,9 @@ namespace MngVm.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(string userName)
+        public ActionResult Delete(string userName, string hostPool)
         {
-            var isAdded = _ldapService.DeleteUser(userName);
+            var isAdded = _ldapService.DeleteUser(userName, hostPool);
             return Json(isAdded, JsonRequestBehavior.AllowGet);
         }
 

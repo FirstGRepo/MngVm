@@ -100,8 +100,12 @@
                     //$('#handler').prop('checked', true);
                     $('.' + machinename).removeClass('off').addClass('on');
                     $('.notice').fadeOut();
-                    if (data.indexOf('running') > 0) {
+                   // if (data.indexOf('running') > 0) {
+                    if ($(".status:contains('running')").length == $(".vmstatusdiv").length) {
+                        console.log('total ' + $(".vmstatusdiv").length);
+                        console.log('Running ' + $(".status:contains('running')").length);
                         clearInterval(interval);
+                        console.log('Clear ' + interval);
                     }
                 }
                 //debugger;
@@ -119,7 +123,6 @@
     }
 
     $(window).on('load', function () {
-
         setTimeout(function () {
             $('.lblMachine').each(function () {
                 //getStatus($(this));

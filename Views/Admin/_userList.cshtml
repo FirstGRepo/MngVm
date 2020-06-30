@@ -34,7 +34,7 @@
                                 <td>@user.Ou</td>
                                 <td>
                                     <a href="/Admin/ChangePassword?userName=@user.UserName" title="Change Password" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn custmButton btnchngpas"><i class="fa fa-lock"></i></a>
-                                    <button title="Delete User" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn custmButton btnDelete"><i class="fa fa-trash"></i></button>
+                                    <button title="Delete User" data-toggle="tooltip" data-placement="top" username=@user.UserName hostPoolName=@user.HostPoolName class="btn custmButton btnDelete"><i class="fa fa-trash"></i></button>
                                 </td>
                             </tr>
                         }
@@ -60,3 +60,9 @@
         </div>
     </div>
 }
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    })
+</script>

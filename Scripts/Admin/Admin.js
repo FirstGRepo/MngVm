@@ -1,6 +1,4 @@
-﻿
-var array=[1,2,3,4,5,6,7,8,9]
-$(function () {
+﻿$(function () {
 
 })
 
@@ -9,27 +7,31 @@ $('#btnSubmit').click(function (e) {
     if (validateForm()) {
         if ($('#Password').val().trim() == $('#confPassword').val().trim()) {
             var Data = $('#frmUser').serializeArray();
+            $('#loader').show();
             $.ajax({
                 url: '/Admin/AddUser',
                 type: 'POST',
                 data: Data,
                 dataType: 'json',
                 success: function (data) {
+                    $('#loader').hide();
                     var status = data.split('|')[0];
                     var message = data.split('|')[1];
                     if (status == "0")
-                        $('#success-alert').removeClass().addClass('alert customalert alert-danger').show().fadeOut(5000);
+                        $('#success-alert').removeClass().addClass('alert customalert alert-danger').show().fadeOut(8000);
                     else if (status == "1") {
                         $('#frmUser input,#frmUser select').val('');
-                        $('#success-alert').removeClass().addClass('alert customalert alert-success').show().fadeOut(5000);
+                        $('#success-alert').removeClass().addClass('alert customalert alert-success').show().fadeOut(8000);
                     }
                     else
-                        $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(5000);
+                        $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(8000);
                     $('#message').text(message);
+                    $('#messageSection').hide();
                     loadList();
                     // $("#success-alert").fadeToggle('1000');
                 },
                 error: function (request, error) {
+                    $('#loader').hide();
                     alert("Request: " + JSON.stringify(request));
                     //  $('#success-alert').addClass('alert-danger');
                 }
@@ -37,7 +39,7 @@ $('#btnSubmit').click(function (e) {
         }
         else {
             $('#Password,#confPassword').addClass('requiredBorder');
-            $('#success-alert').addClass('customalert alert-warning').show().fadeOut(5000);
+            $('#success-alert').addClass('customalert alert-warning').show().fadeOut(10000);
             $('#message').text('Password does not matched.');
         }
 
@@ -46,12 +48,13 @@ $('#btnSubmit').click(function (e) {
 
 $(document).on('click', '.btnDelete', function (e) {
     var username = $(this).attr('username');
+    var hostPoolName = $(this).attr('hostPoolName');
     var flag = confirm('Are you sure, you want to delete "' + username + '"?');
     if (flag) {
         $.ajax({
             url: '/Admin/Delete',
             type: 'POST',
-            data: { userName: username },
+            data: { userName: username, hostPool: hostPoolName },
             dataType: 'json',
             success: function (data) {
                 if (data)
@@ -66,7 +69,11 @@ $(document).on('click', '.btnDelete', function (e) {
 });
 
 function loadList() {
-    $('#userist').load('/Admin/List');
+    $('#loader').show();
+    //$('#userist').load('/Admin/List');
+    $('#userist').load('/Admin/List', function () {
+        $('#loader').hide();
+    });
 }
 
 function validateForm() {
@@ -100,7 +107,7 @@ function checkPassword(str) {
         return false;
 }
 
-$('#Password').focusout(function () {
+$('#Password,#confPassword').focusout(function () {
     if ($(this).val().trim() != '') {
         var msg = "at least one number, one lowercase and one uppercase letter.";
         msg += "At least 8 characters.";
@@ -112,10 +119,23 @@ $('#Password').focusout(function () {
     }
 })
 
+$('#confPassword').focusout(function () {
+    var passwprd = $('#Password').val().trim();
+    var confpasswprd = $(this).val().trim();
+    if (passwprd != confpasswprd) {
+        var msg = "Password does not matched.";
+
+        $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(10000);
+        $('#message').text(msg);
+        $(this).val('');
+
+    }
+})
+
 $('#UserName').focusout(function () {
     if ($(this).val().trim() != '') {
         if (validateEmail($(this).val())) {
-            $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(5000);
+            $('#success-alert').addClass('alert customalert alert-warning').show().fadeOut(8000);
             $('#message').text('Please enter valid username');
             (this).val('')
         }

@@ -12,6 +12,9 @@
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 </head>
 <body>
+    <div id="loader" hidden="hidden">
+        <img src="~/Content/images/spinner.gif" />
+    </div>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -53,8 +56,6 @@
 </html>
 <script>
     $(function () {
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
+        $('[data-toggle="tooltip"]').tooltip();
     })
 </script>

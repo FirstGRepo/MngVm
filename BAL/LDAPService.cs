@@ -10,6 +10,7 @@ using MngVm.Models;
 using MngVm.Constant;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
+using System.Threading.Tasks;
 
 namespace MngVm.BAL
 {
@@ -91,14 +92,14 @@ namespace MngVm.BAL
                                        FirstName = ui.FirstName,
                                        LastName = ui.LastName,
                                        UserName = ui.UserName,
-                                       Ou=ui.Ou,
+                                       Ou = ui.Ou,
                                        HostPoolName = uvm?.HostPoolName
                                    }).ToList();
 
 
                 }
             }
-            return newUserList;
+            return newUserList.OrderBy(x => x.UserName).ToList();
         }
 
         public string CreateNewUser(User user)
@@ -150,10 +151,10 @@ namespace MngVm.BAL
                     newUser.Save();
 
                     // Run powershell command to assign VM
-                    //PowerShellCommand power = new PowerShellCommand();
-                    //power.AssignMachine(user.HostpoolName, user.UserName);
 
-                    retVal = "1|User Added Successfuly";
+                    AssignMachine(user);
+
+                    retVal = "1|User Added Successfuly, It may take approximately 2 minutes to reflect hostpool.";
                 }
                 else
                     retVal = "2|User Already Exist";
@@ -166,6 +167,24 @@ namespace MngVm.BAL
             return retVal;
         }
 
+        public async Task<bool> AssignMachine(User user)
+        {
+            await Task.Run(() =>
+            {
+                PowerShellCommand power = new PowerShellCommand();
+                power.AssignMachine(user.HostPoolName, user.UserName + user.UPNSuffix);
+            });
+            return true;
+        }
+
+        //public bool AssignMachine(User user)
+        //{
+
+        //    PowerShellCommand power = new PowerShellCommand();
+        //    power.AssignMachine(user.HostPoolName, user.UserName);
+
+        //    return true;
+        //}
         public void AddUserToGroup(DirectoryEntry de, DirectoryEntry deUser, string GroupName)
         {
             DirectorySearcher deSearch = new DirectorySearcher();
@@ -331,7 +350,7 @@ namespace MngVm.BAL
 
         }
 
-        public bool DeleteUser(string username)
+        public bool DeleteUser(string username, string hostPoolName)
         {
             bool retval = false;
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
@@ -340,8 +359,19 @@ namespace MngVm.BAL
             {
                 user.Delete();
                 retval = true;
+                DeallocateMachine(hostPoolName, username);
             }
             return retval;
+        }
+
+        public async Task<bool> DeallocateMachine(string hostPoolName, string userName)
+        {
+            await Task.Run(() =>
+            {
+                PowerShellCommand power = new PowerShellCommand();
+                power.DeallocateMachine(hostPoolName, userName);
+            });
+            return true;
         }
 
         public bool DisableUser(string username)
@@ -394,7 +424,5 @@ namespace MngVm.BAL
             return suffixList;
         }
 
-
     }
-
 }
