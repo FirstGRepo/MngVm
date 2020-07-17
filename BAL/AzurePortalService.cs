@@ -12,6 +12,7 @@ namespace MngVm.BAL
     {
         private AzureCredentials credentials;
         public IAzure service;
+         
         public AzurePortalService()
         {
             credentials = SdkContext.AzureCredentialsFactory
@@ -34,12 +35,35 @@ namespace MngVm.BAL
         {
             return service.VirtualMachines.GetByResourceGroup(groupName, vmName);
         }
-        public void Start(string groupName, string vmName)
+        //public void Start(string groupName, string vmName)
+        //{
+        //    IVirtualMachine machine = GetVM(groupName, vmName);
+        //    machine.Start();
+        //}
+
+        public bool Start(string groupName, string vmName)
         {
-            IVirtualMachine machine = GetVM(groupName,vmName);
-            machine.Start();
+            bool _return = false;
+            if (groupName.IsNotNullOrEmpty() && vmName.IsNotNullOrEmpty())
+            {
+                service.VirtualMachines.GetByResourceGroup(groupName, vmName).StartAsync();
+                _return = true;
+            }
+
+            return _return;
         }
 
+        public bool Stop(string groupName, string vmName)
+        {
+            bool _return = false;
+            if (groupName.IsNotNullOrEmpty() && vmName.IsNotNullOrEmpty())
+            {
+                service.VirtualMachines.GetByResourceGroup(groupName, vmName).DeallocateAsync();
+                _return = true;
+            }
+
+            return _return;
+        }
         public PowerState GetVMStatus(string groupName, string vmName)
         {
             IVirtualMachine machine = GetVM(groupName,vmName);
@@ -57,6 +81,8 @@ namespace MngVm.BAL
 
             return _return;
         }
+
+        
 
     }
 }

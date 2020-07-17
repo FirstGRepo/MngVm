@@ -1,0 +1,182 @@
+﻿@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Client Update</title>
+    <script src="https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.en_GB.eR3MfYRCxOg.O/m=auth2/rt=j/sv=1/d=1/ed=1/am=wQE/rs=AGLTcCOngjmPthjBHQKrX_RVBttSalO88w/cb=gapi.loaded_0" async=""></script>
+    <script id="facebook-jssdk" src="https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js"></script>
+    <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-KDJC7QV"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="shortcut icon" href="/images/favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="386496993311-mi108osstu7huta7a2vvtk232m5u56s6.apps.googleusercontent.com">
+    <link href="~/Content/MainSite.css" rel="stylesheet" />
+    <script>
+        var googleUser = {};
+        function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.organizedgains.com/tokensignin.php');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                if (xhr.responseText == 'success') {
+                    window.location.href = 'client_ui.php?ref=main';
+                }
+            };
+            xhr.send('idtoken=' + id_token);
+        }
+        function signOut(provider) {
+            if (provider == 'facebook') {
+                FB.logout(function (response) {
+                    window.location.href = 'logout.php?client=facebook';
+                });
+            } else {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    window.location.href = 'logout.php?client=google';
+                });
+            }
+        }
+        function onLoad() {
+            gapi.load('auth2', function () {
+                gapi.auth2.init();
+            });
+        }
+    </script>
+    <!-- Google Tag Manager -->
+    <script>
+        dataLayer = window.dataLayer || [];
+    </script>
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-KDJC7QV');</script>
+    <!-- End Google Tag Manager -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-129785557-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-129785557-1');
+    </script>
+
+
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDJC7QV"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <script>
+        function statusChangeCallback(response) {
+            if (window.location.pathname.indexOf("client_ui.php") > 0) {
+                return false;
+            }
+            if (response.status === 'connected') {
+                var accessToken = response.authResponse['accessToken'];
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://www.organizedgains.com/tokensignin.php');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function () {
+                    if (xhr.responseText == 'restricted') {
+                        FB.logout();
+                        return false;
+                    }
+                    if (xhr.responseText == 'success') {
+                        window.location.href = 'client_ui.php?ref=main';
+                    }
+                };
+                xhr.send('accessToken=' + accessToken);
+            } else {
+            }
+        }
+
+        function checkLoginState() {
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '225479338108936',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.8'
+            });
+
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        };
+        // Load the SDK asynchronously
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        // Here we run a very simple test of the Graph API after login is
+        // successful.  See statusChangeCallback() for when this call is made.
+
+    </script>
+    <header class="loginheader">
+        <!--<button on="tap:sidebar.toggle" class="ampstart-btn caps m2 header-icon-1"><i class="fa fa-navicon"></i></button>-->
+        <div class="logo_bg"><a href="/" class="header-logo"></a></div>
+        <a href="tel:+19494410691" class="header-phone">(949) 441-0691</a>
+    </header>
+    <div class="page-content" style="z-index:99;margin-top:64px">
+        <h1 class="hdng_txt">Login to start your Dedicated and Shared Workspaces.</h1>
+        <p>Getting started is simple - just click on your preferred login method below.</p>
+        <div class="material-box">
+            <div style="width:320px;margin:0 auto">
+                <a class="btn btn-block btn-social btn-google" href="@Url.Action("RedirectToGoogle","GoogleControl")"><span class="fa fa-google"></span> Sign in with Google</a>
+            </div>
+        </div>
+        <p>*Privacy Statement</p>
+        <p>We take your privacy seriously. By signing in with these services, Google and Facebook only shares your name and email - nothing more. We cannot post on your behalf, and we cannot access your private account information, such as posts or contacts.</p>
+
+    </div>
+    <div class="footer material-box">
+        <div class="foot_top">
+            <a href="#" class="footer-logo"></a>
+            <p class="boxed-text center-text">
+                Books for the Real Estate Investor
+            </p>
+            <p class="center-text">638 Camino De Los Mares, <br> Ste H130-427, <br> San Clemente, CA 92673</p>
+            <p class="center-text mail_info"><a href="tel:888-545-8293">(888) 545-8293</a><a href="mailto:questions@organizedgains.com">questions@organizedgains.com</a></p>
+        </div>
+        <div class="copy_rightsection">
+            <p class="center-text"><span>Copyright 2018. All rights reserved.</span> <a href="#">Terms &amp; Conditions</a> | <a href="#">Privacy Policy</a></p>
+        </div>
+    </div>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async="" defer="" gapi_processed="true"></script>
+
+
+    <iframe id="ssIFrame_google" sandbox="allow-scripts allow-same-origin" aria-hidden="true" frame-border="0" src="https://accounts.google.com/o/oauth2/iframe#origin=https%3A%2F%2Fwww.organizedgains.com&amp;rpcToken=490799299.23944193" style="position: absolute; width: 1px; height: 1px; left: -9999px; top: -9999px; right: -9999px; bottom: -9999px; display: none;"></iframe><div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; width: 0px; height: 0px;"><div></div></div></div>
+</body>
+</html>

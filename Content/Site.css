@@ -1,6 +1,7 @@
 ﻿@import url(https://fonts.googleapis.com/css?family=Roboto:500);
 
 body {
+    font-family: 'Roboto';
     padding-top: 50px;
     padding-bottom: 20px;
 }
@@ -107,20 +108,28 @@ input:checked + .slider:before {
 }
 
 .vmstatusdiv {
-    position:relative;
+    position: relative;
     padding: 10px;
     border: 1px solid;
-    margin: 30px 0;
+    margin: 55px 0;
     border-radius: 14px;
     font-size: 18px;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .status {
     text-transform: capitalize;
+    padding: 13px 15px;
+    color: white;
+    /* font-weight: bold;*/
+    margin-left: 10px;
+}
+
+.notice {
+    background-color: #9898d0;
     padding: 13px;
     color: white;
-    font-weight: bold;
+    /* font-weight: bold;*/
 }
 
 .on {
@@ -136,3 +145,127 @@ input:checked + .slider:before {
     right: 15px;
     bottom: -1%;
 }
+
+footer {
+    /*position: absolute;*/
+    bottom: 50px;
+    text-align: center;
+    left: 0;
+    right: 0;
+}
+
+.vmError {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 38%;
+    color: red;
+    text-align: center;
+}
+
+.requiredBorder {
+    background: #f8f8f8;
+    border: 1px solid red !important;
+}
+
+.customalert {
+    display: none;
+    width: 80%;
+    z-index: 9;
+    text-align: center;
+    top: 10%;
+    position: fixed;
+}
+
+.custmButton {
+    color: white;
+    width: 35%;
+}
+
+.btnDelete {
+    background: #d27b5a;
+}
+
+.btnchngpas {
+    background: #5882a7;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+    font-size: 18px;
+    color: lightblue;
+}
+
+.navbar-inverse .navbar-brand {
+    font-size: 21px;
+    color: lightblue;
+}
+
+.navbar-inverse {
+    /* font-weight: bold;*/
+    background-color: #074a52;
+}
+
+.welcome {
+    margin-top: 45px;
+    color: #074a52;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+
+#messageSection {
+    padding: 2px;
+    border-radius: .1875em;
+    z-index: 5;
+    position: absolute;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 4px 2px -2px rgba(0, 0, 0, 0.2), 0 0 1px 1px rgba(0, 0, 0, 0.15);
+    background-color: #dfeaf6;
+    width: 280px;
+    /* height: 80px;*/
+    left: 300px;
+    top: 0px;
+}
+
+    #messageSection:before,
+    #messageSection:after {
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+        border-right: 14px solid #F5F5F5;
+        position: absolute;
+        content: '';
+        top: 15px;
+        left: -14px;
+    }
+
+    #messageSection:before {
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        border-right: 15px solid #CECECE;
+        top: 13px;
+        left: -15px;
+    }
+
+#loader {
+    z-index: 50;
+    height:100%;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    background: #dddddd5e;
+    top: 0;
+    bottom: 18%;
+}
+
+    #loader img {
+        position: absolute;
+        left: 44%;
+        top: 38%;
+        height: 200px;
+        width: 200px;
+    }

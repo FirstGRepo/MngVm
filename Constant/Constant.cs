@@ -25,6 +25,7 @@ namespace MngVm.Constant
         public static readonly string UserDefaultVMColumn = Convert.ToString(ConfigurationManager.AppSettings["gsvmDefaultVMColumn"]);
         public static readonly string UserResourceGroupColumn = Convert.ToString(ConfigurationManager.AppSettings["gsvmResourceGroupColumn"]);
         public static readonly string SplitChar = Convert.ToString(ConfigurationManager.AppSettings["gsvmSplitChar"]);
+        public static readonly string AdminUsers = Convert.ToString(ConfigurationManager.AppSettings["adminUsers"]);
 
         public static string GetAuthUrl()
         {
@@ -32,6 +33,24 @@ namespace MngVm.Constant
                 return string.Empty;
             else
                 return AuthURL.Replace("{tenant_id}", tenant_id);
+        }
+
+        public static bool IsAdmin(string userEmail)
+        {
+            bool isAdmin = false;
+            if (!string.IsNullOrEmpty(AdminUsers))
+            {
+                string[] adminUser = AdminUsers.Split(",");
+                foreach (string admin in adminUser)
+                {
+                    if (admin.Trim().Equals(userEmail.Trim()))
+                    {
+                        isAdmin = true;
+                        break;
+                    }
+                }
+            }
+            return isAdmin;
         }
     }
 }

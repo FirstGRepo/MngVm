@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using MngVm.Filters;
+using System.Web;
 using System.Web.Mvc;
 
 namespace MngVm
@@ -8,6 +9,7 @@ namespace MngVm
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+           // filters.Add(new AdminAuthorize());
         }
     }
 }

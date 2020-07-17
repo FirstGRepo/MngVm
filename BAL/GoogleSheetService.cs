@@ -261,7 +261,7 @@ namespace MngVm.BAL
                     }
                     _return = new UserProfile()
                     {
-                        email=emailId,
+                        email = emailId,
                         machineInfo = lstMachineInfo
                     };
                 }
@@ -294,8 +294,8 @@ namespace MngVm.BAL
                     _return = new VMLogAutoShut()
                     {
 
-                        AutoShutTime = _autoShutTimeCellValue.IsNullOrEmpty() ? default : TimeSpan.Parse(_autoShutTimeCellValue),
-                        LastUpdated = _lastUpdatedCellValue.IsNullOrEmpty() ? default : Convert.ToDateTime(_lastUpdatedCellValue),
+                        AutoShutTime = _autoShutTimeCellValue.IsNullOrEmpty() ? default(TimeSpan) : TimeSpan.Parse(_autoShutTimeCellValue),
+                        LastUpdated = _lastUpdatedCellValue.IsNullOrEmpty() ? default(DateTime) : Convert.ToDateTime(_lastUpdatedCellValue),
 
                     };
 

@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace MngVm.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         GoogleSheetService _gService = null;
         AzurePortalService _azService = null;
@@ -28,16 +28,20 @@ namespace MngVm.Controllers
                 UserProfile user = _gService.GetUserVMDetail(username);
                 if (user.IsNotNull() && user.machineInfo.Count > 0)
                 {
-                    foreach (var vm in user.machineInfo)
-                    {
-                        var powerState = _azService.GetVMStatus(vm.Resource_Group, vm.MachineName);
-                        if (powerState != null && powerState.Value.Contains("deallocat"))
-                            _azService.Start(vm.Resource_Group, vm.MachineName);
-                    }
+                    //foreach (var vm in user.machineInfo)
+                    //{
+                    //    var powerState = _azService.GetVMStatus(vm.Resource_Group, vm.MachineName);
+                    //    if (powerState != null && powerState.Value.Contains("deallocat"))
+                    //        _azService.Start(vm.Resource_Group, vm.MachineName);
+                    //}
                     return View(user);
                 }
                 else
-                    return Content(MessageConstant.NoMachineFound);
+                {
+                    Session.Abandon();
+                    return Redirect(GoogleContants.ExternalRedirection);
+                    // return Content(MessageConstant.NoMachineFound);
+                }
             }
             else
                 return Content(MessageConstant.LoginUrl);
@@ -46,26 +50,30 @@ namespace MngVm.Controllers
         public ActionResult GetStatus(string resourceGroupName, string machineName)
         {
             var retVal = _azService.GetVMStatus(resourceGroupName, machineName);
-            return Json(retVal, JsonRequestBehavior.AllowGet);
+            return Json(Convert.ToString(retVal), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Start(string machineName,string resourceGrp)
-        {
-            string username = Convert.ToString(Session["username"]);
-            UserProfile user = _gService.GetUserVMDetail(username);
-            _azService.Start(resourceGrp, machineName);
-            var retVal = _azService.GetVMStatus(resourceGrp, machineName);
-            return Json(retVal, JsonRequestBehavior.AllowGet);
-        }
-
-        //public ActionResult Stop()
+        //public ActionResult Start(string machineName, string resourceGrp)
         //{
-        //    string username = Convert.ToString(Session["username"]);
-        //    UserProfile user = _gService.GetUserVMDetail(username);
-        //    _azService.Deallocate(Constant.Constant.resourceGroupName, user.machines[0]);
-        //    var retVal = _azService.GetVMStatus(Constant.Constant.resourceGroupName, user.machines[0]);
-        //    return Json(retVal, JsonRequestBehavior.AllowGet);
+        //    _azService.Start(resourceGrp, machineName);
+        //    var retVal = _azService.GetVMStatus(resourceGrp, machineName);
+        //    return Json(Convert.ToString(retVal), JsonRequestBehavior.AllowGet);
         //}
+
+        public ActionResult Start(string machineName, string resourceGrp)
+        {
+            var powerState = _azService.GetVMStatus(resourceGrp, machineName);
+            if (powerState != null && powerState.Value.Contains("deallocat"))
+                _azService.Start(resourceGrp, machineName);
+            return Json("Starting", JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Stop(string machineName, string resourceGrp)
+        {
+            _azService.Stop(resourceGrp, machineName);
+            //var retVal = _azService.GetVMStatus(resourceGrp, machineName);
+            return Json("Deallocating", JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult Success()
         {
@@ -78,18 +86,38 @@ namespace MngVm.Controllers
                 return Content("Email not found");
             else
             {
-                if (Constant.Constant.IsProduction)
+                if (Constant.Constant.IsAdmin(userinfo.email))
                 {
-                    if (userinfo.email.Contains("@organizedgains.com"))
-                        return RedirectToAction("index");
-                    else
-                        return Redirect(GoogleContants.ExternalRedirection);
+                    Session["isAdmin"] = true;
+                    return RedirectToAction("index", "Admin");
                 }
                 else
                 {
-                    return RedirectToAction("index");
+                    if (Constant.Constant.IsProduction)
+                    {
+                        //if (userinfo.email.Contains("@organizedgains.com"))
+                        return RedirectToAction("index");
+                        //else
+                        //    return Redirect(GoogleContants.ExternalRedirection);
+                    }
+                    else
+                    {
+                        return RedirectToAction("index");
+                    }
                 }
             }
+        }
+
+        public ActionResult SignOut()
+        {
+            Session.Abandon();
+            //return RedirectToAction("Index", "GoogleControl");
+            return RedirectPermanent("https://www.google.com/accounts/Logout");
+        }
+
+        public ActionResult Unauthorize()
+        {
+            return View();
         }
     }
 }
