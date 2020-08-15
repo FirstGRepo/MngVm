@@ -62,7 +62,7 @@ namespace MngVm.BAL
                                 if (_onSheetUserActive)
                                 {
                                     //Update User status to No and change datetime of user
-                                    googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+                                    googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, false);
 
                                 }
 
@@ -138,7 +138,7 @@ namespace MngVm.BAL
                                             if (_onSheetUserActive)
                                             {
                                                 //Update User status to No and change datetime of user
-                                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+                                                googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, false);
 
                                             }
 
@@ -170,7 +170,7 @@ namespace MngVm.BAL
                                                     if (_onSheetUserActive)
                                                     {
                                                         //Update User status to No and change datetime of user
-                                                        googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, true);
+                                                        googleService.UpdateVmLogUserStatus(vmSheetDetail.rowId, UserStatus.InActive, false);
 
                                                     }
                                                 }
@@ -194,6 +194,171 @@ namespace MngVm.BAL
             return _return;
         }
 
+        public bool PerformAzureToGoogleActionLastNCurrentMonthCostUpdate()
+        {
+
+            bool _return = false;
+            try
+            {
+                AzureVMLogger _prop = new AzureVMLogger();
+                AzureUsageApiRequest _request = new AzureUsageApiRequest();
+
+                var _listAllVM = googleService.GetAllVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName);
+
+                if (_listAllVM.IsNotNull())
+                {
+                    //var autoShutDetail = googleService.GetVMAutoShutDetail(); 
+
+                    //// Current Month Cost 
+                    _request = azureService.GetAzureCurrentMonthRequestBody();
+
+                    var _currentMonthCost = azureService.GetAzureUsageDetail(_prop.ApiVersion, _request);
+
+                    //// Last Month Cost 
+                    _request = azureService.GetAzureLastMonthRequestBody();
+
+                    var _lastMonthCost = azureService.GetAzureUsageDetail(_prop.ApiVersion, _request);
+
+
+
+                    int _idxThisMonthPreTaxCost = _currentMonthCost?.properties.columns.FindIndex(x => x.name.Equals("PreTaxCost")) ?? 0;
+                    int _idxThisMonthResourceGroup = _currentMonthCost?.properties.columns.FindIndex(x => x.name.Equals("ResourceGroup")) ?? 0;
+                    int _idxThisMonthResourceId = _currentMonthCost?.properties.columns.FindIndex(x => x.name.Equals("ResourceId")) ?? 0;
+                    int _idxThisMonthCurrency = _currentMonthCost?.properties.columns.FindIndex(x => x.name.Equals("Currency")) ?? 0;
+
+
+                    int _idxLastMonthPreTaxCost = _lastMonthCost?.properties.columns.FindIndex(x => x.name.Equals("PreTaxCost")) ?? 0;
+                    int _idxLastMonthResourceGroup = _lastMonthCost?.properties.columns.FindIndex(x => x.name.Equals("ResourceGroup")) ?? 0;
+                    int _idxLastMonthResourceId = _lastMonthCost?.properties.columns.FindIndex(x => x.name.Equals("ResourceId")) ?? 0;
+                    int _idxLastMonthCurrency = _lastMonthCost?.properties.columns.FindIndex(x => x.name.Equals("Currency")) ?? 0;
+
+                    foreach (VMLogSheetDetail vmSheetDetail in _listAllVM)
+                    {
+                        decimal thisMonthCost = 0;
+                        decimal lastMonthCost = 0;
+
+                        if (vmSheetDetail.IsNotNull())
+                        {
+                            var _thisMonthCostUpdate = _currentMonthCost?.properties.rows.Where(x => CommonConstant.GetVMNameFromUrl(Convert.ToString(x[_idxThisMonthResourceId])).Contains(vmSheetDetail.ServerName, StringComparison.OrdinalIgnoreCase)
+                                                                                                && Convert.ToString(x[_idxThisMonthResourceGroup]).Contains(vmSheetDetail.ResourceGroupName, StringComparison.OrdinalIgnoreCase))
+                                                                                        .FirstOrDefault();
+
+                            var _lastMonthCostUpdate = _lastMonthCost?.properties.rows.Where(x => CommonConstant.GetVMNameFromUrl(Convert.ToString(x[_idxLastMonthResourceId])).Contains(vmSheetDetail.ServerName, StringComparison.OrdinalIgnoreCase)
+                                                                                                && Convert.ToString(x[_idxLastMonthResourceGroup]).Contains(vmSheetDetail.ResourceGroupName, StringComparison.OrdinalIgnoreCase))
+                                                                                       .FirstOrDefault();
+
+                            var vmDetail = azureService.GetVMDetail(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName);
+                            if (vmDetail.IsNotNull())
+                            {
+                                if (_thisMonthCostUpdate.IsNotNull())
+                                {
+                                    decimal.TryParse(Convert.ToString(_thisMonthCostUpdate[_idxThisMonthPreTaxCost]), out thisMonthCost);
+                                    thisMonthCost = decimal.Round(thisMonthCost, 2, MidpointRounding.AwayFromZero);
+                                }
+                                else
+                                {
+                                    thisMonthCost = 0;
+                                }
+
+
+                                googleService.UpdateVmLogLastMonthCost(vmSheetDetail.rowId, string.Format("{0:0.00}", thisMonthCost), 1);
+
+                                if (_lastMonthCostUpdate.IsNotNull())
+                                {
+                                    decimal.TryParse(Convert.ToString(_lastMonthCostUpdate[_idxLastMonthPreTaxCost]), out lastMonthCost);
+                                    lastMonthCost = decimal.Round(lastMonthCost, 2, MidpointRounding.AwayFromZero);
+                                }
+                                else
+                                {
+                                    lastMonthCost = 0;
+                                }
+
+                                googleService.UpdateVmLogLastMonthCost(vmSheetDetail.rowId, string.Format("{0:0.00}", lastMonthCost), 0);
+
+
+                                //calculate difference 
+
+                                var _currenMonthtDate = DateTime.Now;
+                                var _lastMonthDate = DateTime.Now.AddMonths(-1);
+                                int todayDay = _currenMonthtDate.Day;
+
+                                int thisMonthTotalDays = DateTime.DaysInMonth(_currenMonthtDate.Year, _currenMonthtDate.Month);
+                                int lastMonthTotalDays = DateTime.DaysInMonth(_lastMonthDate.Year, _lastMonthDate.Month);
+
+
+                                decimal _avgThisMonthCost = decimal.Round(((thisMonthCost / todayDay) * thisMonthTotalDays), 2, MidpointRounding.AwayFromZero);
+                                decimal thisMonthPer = _avgThisMonthCost <= 0 ? 0 : decimal.Round((lastMonthCost / _avgThisMonthCost) * 100, 2, MidpointRounding.AwayFromZero);
+
+                                if (_avgThisMonthCost > Math.Floor(lastMonthCost))
+                                {
+                                    //Change Color to Red 
+                                }
+
+                                // googleService.UpdateVmLogDiffCost(vmSheetDetail.rowId, string.Format("{0:0.00}%", Math.Floor(thisMonthPer))); 
+
+
+                            }
+                        }
+
+
+
+                    }
+
+
+                }
+
+                _return = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                _return = false;
+            }
+
+            return _return;
+
+        }
+
+        public bool PerformAzureToGoogleActionCPUUpdate()
+        {
+            bool _return = false;
+            try
+            {
+                AzureVMLogger _prop = new AzureVMLogger();
+
+                var _listAllVM = googleService.GetAllVMLogDetail(_prop.VMLogSpreadSheetID, _prop.VMLogSheetName);
+
+                if (_listAllVM.IsNotNull())
+                {
+                    foreach (VMLogSheetDetail vmSheetDetail in _listAllVM)
+                    {
+                        if (vmSheetDetail.IsNotNull())
+                        {
+                            var _cpuUpdate = azureService.GetVMCPUAverage(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName, DateTime.UtcNow, "2018-01-01");
+
+                            if (_cpuUpdate.IsNotNull())
+                            {
+                                googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average5min), 1);
+                                googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average1Hr), 2);
+                                googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average6Hr), 3);
+                                googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average24Hr), 4);
+                            }
+                        }
+                    }
+                }
+
+                _return = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                _return = false;
+            }
+
+            return _return;
+        }
 
         public bool UpdateSheetDate()
         {

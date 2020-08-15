@@ -62,6 +62,23 @@ namespace MngVm.Constant
 
             return _return;
         }
+
+        public static string GetVMNameFromUrl(string url)
+        {
+            string _return = string.Empty;
+
+            if (url.IsNotNullOrEmpty())
+            {
+                var _splitUrl = url.Split(@"/");
+
+                if (_splitUrl.IsNotNull() && _splitUrl.Length > 0)
+                {
+                    _return = _splitUrl[_splitUrl.Length - 1];
+                }
+            }
+
+            return _return;
+        }
     }
 
     public static class ServerStatus

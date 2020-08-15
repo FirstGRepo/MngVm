@@ -155,20 +155,26 @@ namespace MngVm.API
 
             if (grpRequest.IsNotNull())
             {
+                var _azureGoogleProcess = new AzureGoogleProcess();
                 foreach (var host in grpRequest)
                 {
                     if (host.IsNotNull() && host.Count() > 0)
                     {
-                        new AzureGoogleProcess().PerformAzureToGoogleAction(host.ToList(), host.Key);
+                        _azureGoogleProcess.PerformAzureToGoogleAction(host.ToList(), host.Key);
                     }
 
                 }
 
                 var _listVm = grpRequest.Select(x => x.Key).ToList();
 
-                new AzureGoogleProcess().PerformAzureToGoogleActionForUnlistedVM(_listVm);
+                _azureGoogleProcess.PerformAzureToGoogleActionForUnlistedVM(_listVm);
 
-                new AzureGoogleProcess().UpdateSheetDate();
+                //_azureGoogleProcess.PerformAzureToGoogleActionCPUandCostUpdate(); 
+                _azureGoogleProcess.PerformAzureToGoogleActionCPUUpdate();
+
+                _azureGoogleProcess.PerformAzureToGoogleActionLastNCurrentMonthCostUpdate();
+
+                _azureGoogleProcess.UpdateSheetDate();
             }
 
 

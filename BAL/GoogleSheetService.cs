@@ -73,6 +73,51 @@ namespace MngVm.BAL
             return _return;
         }
 
+        public bool UpdateCellValueWithColor(string spreadsheetId, string sheetName, string cellIndex, string value)
+        {
+            bool _return = false;
+            try
+            {
+                string range = $"{ sheetName }!{cellIndex}";
+                var valuesRange = new ValueRange();
+                var objectList = new List<object>() { value };
+                valuesRange.Values = new List<IList<object>> { objectList };
+
+
+
+                //define cell color 
+                var _cellFormat = new CellFormat()
+                {
+                    BackgroundColor = new Color()
+                    {
+                        Blue = 0,
+                        Red = 1,
+                        Green = (float)0.5,
+                        Alpha = (float)0.1
+                    },
+                    TextFormat = new TextFormat()
+                    {
+                        Bold = true
+                    }
+                };
+
+
+                var updateReq = service
+                    .Spreadsheets.Values.Update(valuesRange, spreadsheetId, range);
+                updateReq.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+
+                var updateRespo = updateReq.Execute();
+                _return = true;
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return _return;
+        }
+
         public VMLogSheetDetail GetVMLogDetail(string spreadsheetId, string sheetName, string vmName)
         {
             VMLogSheetDetail _return = null;
@@ -407,6 +452,168 @@ namespace MngVm.BAL
 
             return _return;
         }
+
+
+        public bool UpdateVmLogCPUAverage(int rowID, string value, int indxCPUCol)
+        {
+            bool _return = false;
+
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (rowID > 0 && azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _CPUAvgCol = string.Empty;
+                    char _CPUAvgColRowIndex = char.MinValue;
+                    char _CPUAvgColIndex = char.MinValue;
+
+                    switch (indxCPUCol)
+                    {
+                        case 1:
+                            _CPUAvgCol = azureVMLogger.CPU1Column;
+                            _CPUAvgColRowIndex = azureVMLogger.CPU1Column[1];
+                            _CPUAvgColIndex = azureVMLogger.CPU1Column[0];
+
+                            break;
+                        case 2:
+                            _CPUAvgCol = azureVMLogger.CPU2Column;
+                            _CPUAvgColRowIndex = azureVMLogger.CPU2Column[1];
+                            _CPUAvgColIndex = azureVMLogger.CPU2Column[0];
+                            break;
+                        case 3:
+                            _CPUAvgCol = azureVMLogger.CPU3Column;
+                            _CPUAvgColRowIndex = azureVMLogger.CPU3Column[1];
+                            _CPUAvgColIndex = azureVMLogger.CPU3Column[0];
+                            break;
+                        case 4:
+                            _CPUAvgCol = azureVMLogger.CPU4Column;
+                            _CPUAvgColRowIndex = azureVMLogger.CPU4Column[1];
+                            _CPUAvgColIndex = azureVMLogger.CPU4Column[0];
+                            break;
+                    }
+
+                    string CPUAvgCellName = string.Concat(_CPUAvgColIndex, rowID);
+
+                    if (_CPUAvgCol.IsNotNullOrEmpty() && value.IsNotNullOrEmpty())
+                    {
+                        _return = UpdateCellValue(spreadsheetId, sheetName, CPUAvgCellName, value);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _return = false;
+            }
+
+
+            return _return;
+        }
+
+        /// <summary> 
+        ///  
+        /// Row ID : 0 for Last Month 
+        ///         1 for Current Month 
+        ///  
+        /// </summary> 
+        /// <param name="rowID"></param> 
+        /// <param name="value"></param> 
+        /// <param name="costIndex"></param> 
+        /// <returns></returns> 
+        public bool UpdateVmLogLastMonthCost(int rowID, string value, int monthCostColIndex = 0)
+        {
+            bool _return = false;
+
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (rowID > 0 && azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _MonthCostCol = string.Empty;
+                    char _MonthCostColRowIndex = char.MinValue;
+                    char _MonthCostColIndex = char.MinValue;
+
+                    switch (monthCostColIndex)
+                    {
+                        case 0:
+                            _MonthCostCol = azureVMLogger.LastMonthCostColumn;
+                            _MonthCostColRowIndex = azureVMLogger.LastMonthCostColumn[1];
+                            _MonthCostColIndex = azureVMLogger.LastMonthCostColumn[0];
+
+                            break;
+                        case 1:
+                            _MonthCostCol = azureVMLogger.ThisMonthCostColumn;
+                            _MonthCostColRowIndex = azureVMLogger.ThisMonthCostColumn[1];
+                            _MonthCostColIndex = azureVMLogger.ThisMonthCostColumn[0];
+                            break;
+                    }
+
+
+                    string _MonthCostCellName = string.Concat(_MonthCostColIndex, rowID);
+
+                    if (_MonthCostCol.IsNotNullOrEmpty() && value.IsNotNullOrEmpty())
+                    {
+                        _return = UpdateCellValue(spreadsheetId, sheetName, _MonthCostCellName, value);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _return = false;
+            }
+
+
+            return _return;
+        }
+
+        public bool UpdateVmLogDiffCost(int rowID, string value, string color = null)
+        {
+            bool _return = false;
+
+            try
+            {
+                AzureVMLogger azureVMLogger = new AzureVMLogger();
+
+                if (rowID > 0 && azureVMLogger.VMLogSpreadSheetID.IsNotNullOrEmpty() && azureVMLogger.VMLogSheetName.IsNotNullOrEmpty())
+                {
+                    string spreadsheetId = azureVMLogger.VMLogSpreadSheetID;
+                    string sheetName = azureVMLogger.VMLogSheetName;
+
+                    string _CostDiffCol = azureVMLogger.CostDiffColumn;
+                    char _CostDiffColRowIndex = azureVMLogger.CostDiffColumn[1];
+                    char _CostDiffColIndex = azureVMLogger.CostDiffColumn[0];
+
+
+                    string _CostDiffCellName = string.Concat(_CostDiffColIndex, rowID);
+
+                    if (_CostDiffCol.IsNotNullOrEmpty() && value.IsNotNullOrEmpty())
+                    {
+                        _return = UpdateCellValue(spreadsheetId, sheetName, _CostDiffCellName, value);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _return = false;
+            }
+
+
+            return _return;
+        }
+
 
         public IList<VMLogSheetDetail> GetAllVMLogDetail(string spreadsheetId, string sheetName)
         {
