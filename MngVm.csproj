@@ -240,9 +240,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
+    <!--<Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    </Reference>-->
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
@@ -1036,6 +1036,9 @@
     <Compile Include="Helper\Z\Z.Web\System.Web.UI.Control\Control.FindControlRecursive.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\Extensions.cs" />
     <Compile Include="Helper\Z\Z.Xml.Linq\System.Xml.Linq.XElement\XElement.RemoveAllNamespaces.cs" />
+    <Compile Include="Models\AzureCredentialProperties.cs" />
+    <Compile Include="Models\AzureUsageDetail.cs" />
+    <Compile Include="Models\AzureVMCPU.cs" />
     <Compile Include="Models\HostPoolVms.cs" />
     <Compile Include="Models\MachineInfo.cs" />
     <Compile Include="Models\TokenModel.cs" />
@@ -1046,116 +1049,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Antlr3.Runtime.dll" />
-    <Content Include="bin\Antlr3.Runtime.pdb" />
-    <Content Include="bin\Google.Apis.Auth.dll" />
-    <Content Include="bin\Google.Apis.Auth.pdb" />
-    <Content Include="bin\Google.Apis.Auth.PlatformServices.dll" />
-    <Content Include="bin\Google.Apis.Auth.xml" />
-    <Content Include="bin\Google.Apis.Core.dll" />
-    <Content Include="bin\Google.Apis.Core.pdb" />
-    <Content Include="bin\Google.Apis.Core.xml" />
-    <Content Include="bin\Google.Apis.dll" />
-    <Content Include="bin\Google.Apis.pdb" />
-    <Content Include="bin\Google.Apis.PlatformServices.dll" />
-    <Content Include="bin\Google.Apis.Sheets.v4.dll" />
-    <Content Include="bin\Google.Apis.Sheets.v4.pdb" />
-    <Content Include="bin\Google.Apis.Sheets.v4.xml" />
-    <Content Include="bin\Google.Apis.xml" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.Core.dll" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.Core.xml" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.dll" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.WebKey.dll" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.WebKey.xml" />
-    <Content Include="bin\Microsoft.Azure.KeyVault.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.AppService.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.AppService.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.BatchAI.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.BatchAI.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Cdn.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Cdn.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Compute.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Compute.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerInstance.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerInstance.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerRegistry.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerRegistry.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerService.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.ContainerService.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.CosmosDB.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.CosmosDB.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Dns.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Dns.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.EventHub.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.EventHub.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Graph.RBAC.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Graph.RBAC.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.KeyVault.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.KeyVault.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Locks.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Locks.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Monitor.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Monitor.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Msi.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Msi.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Network.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Network.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.PrivateDns.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.PrivateDns.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Redis.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Redis.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.ResourceManager.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.ResourceManager.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Search.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Search.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.ServiceBus.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.ServiceBus.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Sql.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Sql.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.Storage.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.Storage.Fluent.xml" />
-    <Content Include="bin\Microsoft.Azure.Management.TrafficManager.Fluent.dll" />
-    <Content Include="bin\Microsoft.Azure.Management.TrafficManager.Fluent.xml" />
-    <Content Include="bin\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
-    <Content Include="bin\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll" />
-    <Content Include="bin\Microsoft.IdentityModel.Clients.ActiveDirectory.xml" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.Azure.Authentication.dll" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.Azure.Authentication.xml" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.Azure.dll" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.Azure.xml" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.dll" />
-    <Content Include="bin\Microsoft.Rest.ClientRuntime.xml" />
-    <Content Include="bin\Microsoft.Web.Infrastructure.dll" />
-    <Content Include="bin\Microsoft.WindowsAzure.Storage.dll" />
-    <Content Include="bin\Microsoft.WindowsAzure.Storage.pdb" />
-    <Content Include="bin\Microsoft.WindowsAzure.Storage.xml" />
-    <Content Include="bin\MngVm.dll" />
-    <Content Include="bin\MngVm.pdb" />
-    <Content Include="bin\Newtonsoft.Json.dll" />
-    <Content Include="bin\Newtonsoft.Json.xml" />
-    <Content Include="bin\System.Net.Http.Formatting.dll" />
-    <Content Include="bin\System.Net.Http.Formatting.xml" />
-    <Content Include="bin\System.Web.Helpers.dll" />
-    <Content Include="bin\System.Web.Helpers.xml" />
-    <Content Include="bin\System.Web.Http.dll" />
-    <Content Include="bin\System.Web.Http.WebHost.dll" />
-    <Content Include="bin\System.Web.Http.WebHost.xml" />
-    <Content Include="bin\System.Web.Http.xml" />
-    <Content Include="bin\System.Web.Mvc.dll" />
-    <Content Include="bin\System.Web.Mvc.xml" />
-    <Content Include="bin\System.Web.Optimization.dll" />
-    <Content Include="bin\System.Web.Optimization.xml" />
-    <Content Include="bin\System.Web.Razor.dll" />
-    <Content Include="bin\System.Web.Razor.xml" />
-    <Content Include="bin\System.Web.WebPages.Deployment.dll" />
-    <Content Include="bin\System.Web.WebPages.Deployment.xml" />
-    <Content Include="bin\System.Web.WebPages.dll" />
-    <Content Include="bin\System.Web.WebPages.Razor.dll" />
-    <Content Include="bin\System.Web.WebPages.Razor.xml" />
-    <Content Include="bin\System.Web.WebPages.xml" />
-    <Content Include="bin\WebGrease.dll" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -1176,7 +1069,6 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Credentials\azureauth.properties" />
     <Content Include="Credentials\googleauth.json" />
-    <Content Include="bin\MngVm.dll.config" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\fontawesome-webfont.woff" />
