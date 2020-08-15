@@ -128,14 +128,56 @@ namespace MngVm.BAL
         {
             string _token = string.Empty;
 
-            if (azureCredentialProperties.IsNotNull())
-            {
-                var context = new AuthenticationContext("https://login.microsoftonline.com/" + azureCredentialProperties.TenantID, false);
-                var result = context.AcquireTokenAsync("https://management.core.windows.net/", new ClientCredential(azureCredentialProperties.ClientID, azureCredentialProperties.SecretKey)).Result;
+            //if (azureCredentialProperties.IsNotNull())
+            //{
+            //    var context = new AuthenticationContext("https://login.microsoftonline.com/" + azureCredentialProperties.TenantID, false);
+            //    var result = context.AcquireTokenAsync("https://management.core.windows.net/", new ClientCredential(azureCredentialProperties.ClientID, azureCredentialProperties.SecretKey)).Result;
 
-                //_token = string.Concat("Bearer ", result.AccessToken); 
-                _token = result.AccessToken;
+            //    //_token = string.Concat("Bearer ", result.AccessToken); 
+            //    _token = result.AccessToken;
+            //}
+
+            string requestUri = $"https://login.microsoftonline.com/{azureCredentialProperties.TenantID}/oauth2/token";
+
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    IList<KeyValuePair<string, string>> credKeyValues = new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("grant_type","client_credentials"),
+                    new KeyValuePair<string, string>("client_id",azureCredentialProperties.ClientID),
+                    new KeyValuePair<string, string>("client_secret",azureCredentialProperties.SecretKey),
+                    new KeyValuePair<string, string>("resource",azureCredentialProperties.BaseURL),
+                    };
+
+                    using (var content = new FormUrlEncodedContent(credKeyValues))
+                    {
+                        //content.Headers.Clear();
+                        //content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+                        var response = httpClient.PostAsync(requestUri, content).Result;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseContent = response.Content.ReadAsStringAsync().Result;
+
+                            var _azureAccessToken = JsonConvert.DeserializeObject<AzureAccessToken>(responseContent);
+                            if (_azureAccessToken.IsNotNull())
+                            {
+                                _token = _azureAccessToken.access_token;
+                            }
+
+                        }
+
+                    }
+                }
+
             }
+            catch (Exception ex)
+            {
+
+            }
+
 
             return _token;
         }
@@ -143,7 +185,7 @@ namespace MngVm.BAL
         public AzureUsageDetail GetAzureUsageDetail(string apiVersion, string expand = null, string filter = null)
         {
             AzureUsageDetail _return = new AzureUsageDetail();
-            HttpClient httpClient = new HttpClient();
+
 
             string requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/providers/Microsoft.Consumption/usageDetails?api-version={apiVersion}";
 
@@ -160,18 +202,20 @@ namespace MngVm.BAL
             try
             {
                 string _token = GetBearerAuthToken();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
-
-                var response = httpClient.GetAsync(requestUri).Result;
-
-                if (response.IsSuccessStatusCode)
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    var content = response.Content.ReadAsStringAsync().Result;
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
 
-                    _return = JsonConvert.DeserializeObject<AzureUsageDetail>(content);
+                    var response = httpClient.GetAsync(requestUri).Result;
 
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = response.Content.ReadAsStringAsync().Result;
+
+                        _return = JsonConvert.DeserializeObject<AzureUsageDetail>(content);
+
+                    }
                 }
-
 
 
             }
@@ -186,26 +230,28 @@ namespace MngVm.BAL
         public AzureUsageApiResponse GetAzureUsageDetail(string apiVersion, AzureUsageApiRequest requestBody)
         {
             AzureUsageApiResponse _return = new AzureUsageApiResponse();
-            HttpClient httpClient = new HttpClient();
 
             string requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/providers/Microsoft.CostManagement/query?api-version={apiVersion}";
 
             try
             {
                 string _token = GetBearerAuthToken();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
 
-                var response = httpClient.PostAsJsonAsync(requestUri, requestBody).Result;
-
-                if (response.IsSuccessStatusCode)
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    var content = response.Content.ReadAsStringAsync().Result;
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
 
-                    _return = JsonConvert.DeserializeObject<AzureUsageApiResponse>(content);
+                    var response = httpClient.PostAsJsonAsync(requestUri, requestBody).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = response.Content.ReadAsStringAsync().Result;
+
+                        _return = JsonConvert.DeserializeObject<AzureUsageApiResponse>(content);
+
+                    }
 
                 }
-
-
 
             }
             catch (Exception ex)
@@ -276,7 +322,6 @@ namespace MngVm.BAL
 
             List<string> cpuDate = new List<string>() { "P1D", "PT6H", "PT1H", "PT5M" };
 
-            HttpClient httpClient = new HttpClient();
             string timespanA = string.Empty;
             string timespanB = JsonConvert.SerializeObject(date).Replace(@"""", @"");
             string requestUri = string.Empty;
@@ -284,74 +329,76 @@ namespace MngVm.BAL
             try
             {
                 string _token = GetBearerAuthToken();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
-
-                foreach (var interval in cpuDate)
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    switch (interval)
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+
+                    foreach (var interval in cpuDate)
                     {
-                        case "P1D":
-                            timespanA = JsonConvert.SerializeObject(date.AddDays(-1)).Replace(@"""", @"");
-                            break;
-                        case "PT6H":
-                            timespanA = JsonConvert.SerializeObject(date.AddHours(-6)).Replace(@"""", @"");
-                            break;
-                        case "PT1H":
-                            timespanA = JsonConvert.SerializeObject(date.AddHours(-1)).Replace(@"""", @"");
-                            break;
-                        case "PT5M":
-                            timespanA = JsonConvert.SerializeObject(date.AddMinutes(-5)).Replace(@"""", @"");
-                            break;
-                    }
-
-                    //requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={timespanA}/{timespanB}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU"; 
-                    requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={interval}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU";
-
-
-                    var response = httpClient.GetAsync(requestUri).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = response.Content.ReadAsStringAsync().Result;
-
-                        var azureCPUUsage = JsonConvert.DeserializeObject<AzureCPUUsage>(content);
-
-                        if (azureCPUUsage.IsNotNull() && azureCPUUsage.value.IsNotNull() && azureCPUUsage.value.Count > 0)
+                        switch (interval)
                         {
-                            var _value = azureCPUUsage.value[0];
+                            case "P1D":
+                                timespanA = JsonConvert.SerializeObject(date.AddDays(-1)).Replace(@"""", @"");
+                                break;
+                            case "PT6H":
+                                timespanA = JsonConvert.SerializeObject(date.AddHours(-6)).Replace(@"""", @"");
+                                break;
+                            case "PT1H":
+                                timespanA = JsonConvert.SerializeObject(date.AddHours(-1)).Replace(@"""", @"");
+                                break;
+                            case "PT5M":
+                                timespanA = JsonConvert.SerializeObject(date.AddMinutes(-5)).Replace(@"""", @"");
+                                break;
+                        }
 
-                            if (_value.timeseries.IsNotNull() && _value.timeseries.Count > 0)
+                        //requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={timespanA}/{timespanB}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU"; 
+                        requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={interval}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU";
+
+
+                        var response = httpClient.GetAsync(requestUri).Result;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var content = response.Content.ReadAsStringAsync().Result;
+
+                            var azureCPUUsage = JsonConvert.DeserializeObject<AzureCPUUsage>(content);
+
+                            if (azureCPUUsage.IsNotNull() && azureCPUUsage.value.IsNotNull() && azureCPUUsage.value.Count > 0)
                             {
-                                var _timeseriesData = _value.timeseries[0].data;
-                                if (_timeseriesData.IsNotNull() && _timeseriesData.Count > 0)
-                                {
-                                    var _lastRecord = _timeseriesData[_timeseriesData.Count - 1];
+                                var _value = azureCPUUsage.value[0];
 
-                                    switch (interval)
+                                if (_value.timeseries.IsNotNull() && _value.timeseries.Count > 0)
+                                {
+                                    var _timeseriesData = _value.timeseries[0].data;
+                                    if (_timeseriesData.IsNotNull() && _timeseriesData.Count > 0)
                                     {
-                                        case "P1D":
-                                            _return.Average24Hr = _lastRecord.average;
-                                            break;
-                                        case "PT6H":
-                                            _return.Average6Hr = _lastRecord.average;
-                                            break;
-                                        case "PT1H":
-                                            _return.Average1Hr = _lastRecord.average;
-                                            break;
-                                        case "PT5M":
-                                            _return.Average5min = _lastRecord.average;
-                                            break;
+                                        var _lastRecord = _timeseriesData[_timeseriesData.Count - 1];
+
+                                        switch (interval)
+                                        {
+                                            case "P1D":
+                                                _return.Average24Hr = _lastRecord.average;
+                                                break;
+                                            case "PT6H":
+                                                _return.Average6Hr = _lastRecord.average;
+                                                break;
+                                            case "PT1H":
+                                                _return.Average1Hr = _lastRecord.average;
+                                                break;
+                                            case "PT5M":
+                                                _return.Average5min = _lastRecord.average;
+                                                break;
+                                        }
+
                                     }
 
                                 }
 
                             }
-
                         }
+
                     }
-
                 }
-
             }
             catch (Exception ex)
             {
