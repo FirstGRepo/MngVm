@@ -28,7 +28,10 @@ namespace MngVm.API
         {
             AzurePortalService service = new AzurePortalService();
 
-            service.GetVM("", "");
+            //service.GetVM("", "");
+            //var _azureGoogleProcess = new AzureGoogleProcess();
+            //_azureGoogleProcess.PerformAzureToGoogleActionCPUUpdate();
+            //_azureGoogleProcess.PerformAzureToGoogleActionLastNCurrentMonthCostUpdate();
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -141,9 +144,9 @@ namespace MngVm.API
         public HttpResponseMessage ProcessVMScheduler(IList<RunCommandRequest> requestList)
         {
 
-           // requestList = new List<RunCommandRequest>();
+            requestList = new List<RunCommandRequest>();
 
-           // GenerateDumbData(ref requestList);
+            GenerateDumbData(ref requestList);
 
 
             if (requestList.IsNull())
@@ -188,10 +191,10 @@ namespace MngVm.API
             requestList.Add(new RunCommandRequest()
             {
                 SessionHostName = "WVDHP01VM-0.fws.local",
-                AdUserName = @"FWS\wvduser9",
+                AdUserName = @"FWS\test",
                 LogonTime = DateTime.Now,
-                SessionId = "1",
-                State = "Disconnected",
+                SessionId = "2",
+                State = "Active",
                 TenantName = "FWS Tenant"
 
             });

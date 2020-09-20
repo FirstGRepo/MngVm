@@ -29,6 +29,7 @@ namespace MngVm.Constant
         public string CPU2Column => ConfigurationManager.AppSettings["azvmServerCPU2Column"];
         public string CPU3Column => ConfigurationManager.AppSettings["azvmServerCPU3Column"];
         public string CPU4Column => ConfigurationManager.AppSettings["azvmServerCPU4Column"];
+        public string CPUPeakColumn => ConfigurationManager.AppSettings["azvmServerCPUPeakColumn"];
         public string ThisMonthCostColumn => ConfigurationManager.AppSettings["azvmServerThisMonthCostColumn"];
         public string LastMonthCostColumn => ConfigurationManager.AppSettings["azvmServerLastMonthCostColumn"];
         public string CostDiffColumn => ConfigurationManager.AppSettings["azvmServerCostDiffColumn"];

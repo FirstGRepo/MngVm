@@ -12,6 +12,7 @@ namespace MngVm.Models
         public double Average1Hr { get; set; }
         public double Average6Hr { get; set; }
         public double Average24Hr { get; set; }
+        public double Peak24Hr { get; set; }
     }
 
 

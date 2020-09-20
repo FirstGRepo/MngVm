@@ -320,10 +320,18 @@ namespace MngVm.BAL
         {
             AzureVMCPU _return = new AzureVMCPU();
 
-            List<string> cpuDate = new List<string>() { "P1D", "PT6H", "PT1H", "PT5M" };
+            //var cpuDate = new List<dynamic>() { "P1D", "PT6H", "PT1H", "PT5M" };
+
+            var cpuDate = new List<dynamic>() { new { timespan = "P1D", interval = "P1D" },
+                                                new { timespan = "PT6H", interval = "PT6H" },
+                                                new { timespan = "PT1H", interval = "PT1H" },
+                                                new { timespan = "PT5M", interval = "PT5M" },
+                                                new { timespan = "P1D", interval = "PT1H" }
+                                                };
 
             string timespanA = string.Empty;
-            string timespanB = JsonConvert.SerializeObject(date).Replace(@"""", @"");
+            //string timespanB = JsonConvert.SerializeObject(date).Replace(@"""", @"");
+            string timespanB = date.ToString("yyyy-MM-ddTHH:mm:00.000Z");
             string requestUri = string.Empty;
 
             try
@@ -335,25 +343,25 @@ namespace MngVm.BAL
 
                     foreach (var interval in cpuDate)
                     {
-                        switch (interval)
+                        switch (interval.timespan)
                         {
                             case "P1D":
-                                timespanA = JsonConvert.SerializeObject(date.AddDays(-1)).Replace(@"""", @"");
+                                //timespanA = JsonConvert.SerializeObject(date.AddDays(-1)).Replace(@"""", @"");
+                                timespanA = date.AddDays(-1).ToString("yyyy-MM-ddTHH:mm:00.000Z");
                                 break;
                             case "PT6H":
-                                timespanA = JsonConvert.SerializeObject(date.AddHours(-6)).Replace(@"""", @"");
+                                timespanA = date.AddHours(-6).ToString("yyyy-MM-ddTHH:mm:00.000Z");
                                 break;
                             case "PT1H":
-                                timespanA = JsonConvert.SerializeObject(date.AddHours(-1)).Replace(@"""", @"");
+                                timespanA = date.AddHours(-1).ToString("yyyy-MM-ddTHH:mm:00.000Z");
                                 break;
                             case "PT5M":
-                                timespanA = JsonConvert.SerializeObject(date.AddMinutes(-5)).Replace(@"""", @"");
+                                timespanA = date.AddMinutes(-5).ToString("yyyy-MM-ddTHH:mm:00.000Z");
                                 break;
                         }
 
-                        //requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={timespanA}/{timespanB}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU"; 
-                        requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={interval}&interval={interval}&api-version={apiVersion}&metricnames=Percentage CPU";
-
+                        //requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={timespanA}/{timespanB}&interval={interval.interval}&api-version={apiVersion}&metricnames=Percentage CPU"; 
+                        requestUri = $"https://management.azure.com/subscriptions/{azureCredentialProperties.SubscriptionID}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/microsoft.insights/metrics?timespan={timespanA}/{timespanB}&interval={interval.interval}&api-version={apiVersion}&metricnames=Percentage CPU&aggregation=average&metricNamespace=Microsoft.Compute/virtualMachines&autoadjusttimegrain=true&validatedimensions=false";
 
                         var response = httpClient.GetAsync(requestUri).Result;
 
@@ -374,7 +382,7 @@ namespace MngVm.BAL
                                     {
                                         var _lastRecord = _timeseriesData[_timeseriesData.Count - 1];
 
-                                        switch (interval)
+                                        switch (interval.interval)
                                         {
                                             case "P1D":
                                                 _return.Average24Hr = _lastRecord.average;
@@ -383,17 +391,21 @@ namespace MngVm.BAL
                                                 _return.Average6Hr = _lastRecord.average;
                                                 break;
                                             case "PT1H":
-                                                _return.Average1Hr = _lastRecord.average;
+                                                if (interval.timespan == "P1D")
+                                                {
+                                                    _return.Peak24Hr = _timeseriesData.Max(x => x.average);
+                                                }
+                                                else
+                                                {
+                                                    _return.Average1Hr = _lastRecord.average;
+                                                }
                                                 break;
                                             case "PT5M":
                                                 _return.Average5min = _lastRecord.average;
                                                 break;
                                         }
-
                                     }
-
                                 }
-
                             }
                         }
 

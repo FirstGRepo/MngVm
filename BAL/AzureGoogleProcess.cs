@@ -287,14 +287,20 @@ namespace MngVm.BAL
 
 
                                 decimal _avgThisMonthCost = decimal.Round(((thisMonthCost / todayDay) * thisMonthTotalDays), 2, MidpointRounding.AwayFromZero);
-                                decimal thisMonthPer = _avgThisMonthCost <= 0 ? 0 : decimal.Round((lastMonthCost / _avgThisMonthCost) * 100, 2, MidpointRounding.AwayFromZero);
 
-                                if (_avgThisMonthCost > Math.Floor(lastMonthCost))
+                                decimal costDiff = 0;
+                                bool isRedColor = false;
+                                if (lastMonthCost >= _avgThisMonthCost)
                                 {
-                                    //Change Color to Red 
+                                    costDiff = _avgThisMonthCost <= 0 ? 0 : decimal.Round((_avgThisMonthCost * 100) / lastMonthCost, 2, MidpointRounding.AwayFromZero);
+                                }
+                                else
+                                {
+                                    isRedColor = true;
+                                    costDiff = _avgThisMonthCost <= 0 ? 0 : decimal.Round(((_avgThisMonthCost - lastMonthCost) * 100) / _avgThisMonthCost, 2, MidpointRounding.AwayFromZero);
                                 }
 
-                                // googleService.UpdateVmLogDiffCost(vmSheetDetail.rowId, string.Format("{0:0.00}%", Math.Floor(thisMonthPer))); 
+                                googleService.UpdateVmLogDiffCost(vmSheetDetail.rowId, string.Format("{0:0.00}%", Math.Floor(costDiff)), isRedColor);
 
 
                             }
@@ -331,11 +337,14 @@ namespace MngVm.BAL
 
                 if (_listAllVM.IsNotNull())
                 {
+                    var _utcDate = DateTime.UtcNow;
+                    var _paramDate = new DateTime(_utcDate.Year, _utcDate.Month, _utcDate.Day, _utcDate.Hour, _utcDate.Minute, 0);
+
                     foreach (VMLogSheetDetail vmSheetDetail in _listAllVM)
                     {
                         if (vmSheetDetail.IsNotNull())
                         {
-                            var _cpuUpdate = azureService.GetVMCPUAverage(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName, DateTime.UtcNow, "2018-01-01");
+                            var _cpuUpdate = azureService.GetVMCPUAverage(vmSheetDetail.ResourceGroupName, vmSheetDetail.ServerName, _paramDate, "2019-07-01");
 
                             if (_cpuUpdate.IsNotNull())
                             {
@@ -343,6 +352,7 @@ namespace MngVm.BAL
                                 googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average1Hr), 2);
                                 googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average6Hr), 3);
                                 googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Average24Hr), 4);
+                                googleService.UpdateVmLogCPUAverage(vmSheetDetail.rowId, string.Format("{0:0.00}", _cpuUpdate.Peak24Hr), 5);
                             }
                         }
                     }

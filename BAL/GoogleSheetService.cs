@@ -73,38 +73,87 @@ namespace MngVm.BAL
             return _return;
         }
 
-        public bool UpdateCellValueWithColor(string spreadsheetId, string sheetName, string cellIndex, string value)
+        public bool UpdateCellValueWithColorRed(string spreadsheetId, string sheetName, string cellIndex, string value, bool isRed)
         {
             bool _return = false;
             try
             {
                 string range = $"{ sheetName }!{cellIndex}";
-                var valuesRange = new ValueRange();
-                var objectList = new List<object>() { value };
-                valuesRange.Values = new List<IList<object>> { objectList };
+                //var valuesRange = new ValueRange();
+                //var objectList = new List<object>() { value };
+                //valuesRange.Values = new List<IList<object>> { objectList };
 
 
 
+                //get sheet id by sheet name
+                SpreadsheetsResource.GetRequest spresRequest = service.Spreadsheets.Get(spreadsheetId);
+                spresRequest.Ranges = new List<string>() { range };
+                spresRequest.IncludeGridData = true;
+
+                Spreadsheet spr = spresRequest.Execute();
+                Sheet sh = spr.Sheets.Where(s => s.Properties.Title == sheetName).FirstOrDefault();
+                int sheetId = (int)sh.Properties.SheetId;
+
+                var _dataInCell = sh.Data?[0];
                 //define cell color 
                 var _cellFormat = new CellFormat()
                 {
                     BackgroundColor = new Color()
                     {
-                        Blue = 0,
+                        Blue = 1,
                         Red = 1,
-                        Green = (float)0.5,
-                        Alpha = (float)0.1
+                        Green = 1,
+                        Alpha = 0
                     },
                     TextFormat = new TextFormat()
                     {
-                        Bold = true
+                        Bold = true,
+                        ForegroundColor = new Color()
+                        {
+                            Blue = 0,
+                            Red = isRed ? 1 : 0,
+                            Green = 0,
+                            Alpha = 0
+                        },
                     }
                 };
 
 
-                var updateReq = service
-                    .Spreadsheets.Values.Update(valuesRange, spreadsheetId, range);
-                updateReq.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                BatchUpdateSpreadsheetRequest bussr = new BatchUpdateSpreadsheetRequest();
+                //create the update request for cells from the first row
+                var updateCellsRequest = new Request()
+                {
+                    RepeatCell = new RepeatCellRequest()
+                    {
+
+                        Range = new GridRange()
+                        {
+                            SheetId = sheetId,
+                            StartColumnIndex = _dataInCell?.StartColumn,
+                            StartRowIndex = _dataInCell?.StartRow,
+                            EndColumnIndex = _dataInCell?.StartColumn + 1,
+                            EndRowIndex = _dataInCell?.StartRow + 1,
+                        },
+                        Cell = new CellData()
+                        {
+                            
+                            FormattedValue = value,
+                            UserEnteredValue = new ExtendedValue() { StringValue = value},
+                            UserEnteredFormat = _cellFormat
+                        },
+                        //Fields = "UserEnteredFormat(BackgroundColor,TextFormat)"
+                        Fields = "UserEnteredValue,UserEnteredFormat(BackgroundColor,TextFormat)"
+                    }
+                };
+                bussr.Requests = new List<Request>();
+                bussr.Requests.Add(updateCellsRequest);
+                var updateReq = service.Spreadsheets.BatchUpdate(bussr, spreadsheetId);
+                //bur.Execute();
+
+
+                //var updateReq = service
+                //    .Spreadsheets.Values.Update(valuesRange, spreadsheetId, range);
+                //updateReq.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 
                 var updateRespo = updateReq.Execute();
                 _return = true;
@@ -494,6 +543,11 @@ namespace MngVm.BAL
                             _CPUAvgColRowIndex = azureVMLogger.CPU4Column[1];
                             _CPUAvgColIndex = azureVMLogger.CPU4Column[0];
                             break;
+                        case 5:
+                            _CPUAvgCol = azureVMLogger.CPUPeakColumn;
+                            _CPUAvgColRowIndex = azureVMLogger.CPUPeakColumn[1];
+                            _CPUAvgColIndex = azureVMLogger.CPUPeakColumn[0];
+                            break;
                     }
 
                     string CPUAvgCellName = string.Concat(_CPUAvgColIndex, rowID);
@@ -577,7 +631,7 @@ namespace MngVm.BAL
             return _return;
         }
 
-        public bool UpdateVmLogDiffCost(int rowID, string value, string color = null)
+        public bool UpdateVmLogDiffCost(int rowID, string value, bool isExceed = false)
         {
             bool _return = false;
 
@@ -599,7 +653,7 @@ namespace MngVm.BAL
 
                     if (_CostDiffCol.IsNotNullOrEmpty() && value.IsNotNullOrEmpty())
                     {
-                        _return = UpdateCellValue(spreadsheetId, sheetName, _CostDiffCellName, value);
+                        _return = UpdateCellValueWithColorRed(spreadsheetId, sheetName, _CostDiffCellName, value, isExceed);
                     }
 
                 }
