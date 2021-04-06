@@ -91,6 +91,11 @@ namespace MngVm.Controllers
                     Session["isAdmin"] = true;
                     return RedirectToAction("index", "Admin");
                 }
+                else if(Constant.Constant.IsSubAdmin(userinfo.email))
+                {
+                    Session["isSubAdmin"] = true;
+                    return RedirectToAction("index", "Admin");
+                }
                 else
                 {
                     if (Constant.Constant.IsProduction)

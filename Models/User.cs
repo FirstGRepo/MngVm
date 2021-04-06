@@ -25,5 +25,6 @@ namespace MngVm.Models
         public string Ou { get; set; }
         public string HostPoolName { get; set; }
         public string VmName { get; set; }
+        public bool IsSubAdminAssigned { get; set; }
     }
 }

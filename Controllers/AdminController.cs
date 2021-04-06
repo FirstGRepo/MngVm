@@ -43,21 +43,29 @@ namespace MngVm.Controllers
 
         public ActionResult List()
         {
-            List<User> users = _ldapService.GetAllUsers();
+            List<User> users = null;
+
+            if (Session["isAdmin"]!=null && Convert.ToBoolean(Session["isAdmin"]))
+            {
+                users= _ldapService.GetAllUsers();
+            } else if(Session["isSubAdmin"] != null && Convert.ToBoolean(Session["isSubAdmin"])) {
+                users= _ldapService.GetAllSubAdminUsers();
+            }
+
             return PartialView("_userList", users);
         }
 
         [HttpPost]
         public ActionResult AddUser(User user)
         {
-            var message = _ldapService.CreateNewUser(user);
+            var message = _ldapService.CreateNewUser(user, Session["isSubAdmin"] != null && Convert.ToBoolean(Session["isSubAdmin"]));
             return Json(message, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Update(User user)
         {
 
-            var isAdded = _ldapService.CreateNewUser(user);
+            var isAdded = _ldapService.CreateNewUser(user, Session["isSubAdmin"] != null && Convert.ToBoolean(Session["isSubAdmin"]));
             return Json(isAdded, JsonRequestBehavior.AllowGet);
         }
 
@@ -65,6 +73,13 @@ namespace MngVm.Controllers
         public ActionResult Delete(string userName, string hostPool)
         {
             var isAdded = _ldapService.DeleteUser(userName, hostPool);
+            return Json(isAdded, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult AddRemoveSubAdmin(string userName, string hostPool, bool isAdd)
+        {
+            var isAdded = _ldapService.AddRemoveSubAdmin(userName, isAdd);
             return Json(isAdded, JsonRequestBehavior.AllowGet);
         }
 

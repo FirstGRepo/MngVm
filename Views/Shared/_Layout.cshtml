@@ -29,7 +29,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="@Url.Action("Index","Home")">Home</a></li>
-                    @if (Session["isAdmin"].IsNotNull())
+                    @if (Session["isAdmin"].IsNotNull() || Session["isSubAdmin"].IsNotNull())
                     {
                         <li><a href="@Url.Action("Index","Admin")">Users</a></li>
                     }

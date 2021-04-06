@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.DirectoryServices;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +21,8 @@ namespace MngVm.BAL
         static string domain2Name = LDAPContants.Domain2Name;
         static string userName = LDAPContants.UserName;
         static string password = LDAPContants.Password;
+        static string subAdminGroupName = LDAPContants.SubAdminGroupName;
+        static string subAdminGroupCN = LDAPContants.SubAdminGroupCN;
 
         DirectoryEntry _directoryEntry;
         public LDAPService()
@@ -73,12 +75,28 @@ namespace MngVm.BAL
                 {
                     foreach (SearchResult sr in results)
                     {
+                        bool _isSubAdminAssign = false;
+
+                        if (sr.Properties["memberOf"] != null)
+                        {
+                            foreach (var rpv in sr.Properties["memberOf"])
+                            {
+                                if (rpv is string)
+                                {
+                                    _isSubAdminAssign = rpv.ToString().IndexOf($"cn={subAdminGroupName}", StringComparison.OrdinalIgnoreCase) >= 0;
+                                    if (_isSubAdminAssign) break;
+                                }
+                            }
+                        }
+
+
                         User user = new User
                         {
                             FirstName = sr.Properties["givenname"].Count > 0 ? Convert.ToString(sr.Properties["givenname"][0]) : string.Empty,
                             LastName = sr.Properties["sn"].Count > 0 ? Convert.ToString(sr.Properties["sn"][0]) : string.Empty,
                             UserName = sr.Properties["userprincipalname"].Count > 0 ? Convert.ToString(sr.Properties["userprincipalname"][0]) : string.Empty,
                             Ou = ou,
+                            IsSubAdminAssigned = _isSubAdminAssign,
                         };
                         userList.Add(user);
                     }
@@ -93,7 +111,8 @@ namespace MngVm.BAL
                                        LastName = ui.LastName,
                                        UserName = ui.UserName,
                                        Ou = ui.Ou,
-                                       HostPoolName = uvm?.HostPoolName
+                                       HostPoolName = uvm?.HostPoolName,
+                                       IsSubAdminAssigned = ui.IsSubAdminAssigned,
                                    }).ToList();
 
 
@@ -102,7 +121,7 @@ namespace MngVm.BAL
             return newUserList.OrderBy(x => x.UserName).ToList();
         }
 
-        public string CreateNewUser(User user)
+        public string CreateNewUser(User user, bool IsSubAdmin)
         {
             string retVal;
             try
@@ -150,6 +169,10 @@ namespace MngVm.BAL
                     newUser.SetPassword(user.Password);
                     newUser.Save();
 
+                    if (IsSubAdmin)
+                    {
+                        AddRemoveSubAdmin(user.UserName, true);
+                    }
                     // Run powershell command to assign VM
 
                     AssignMachine(user);
@@ -364,6 +387,42 @@ namespace MngVm.BAL
             return retval;
         }
 
+        public bool AddRemoveSubAdmin(string username, bool isAdd)
+        {
+            bool retval = false;
+            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, username);
+            if (user != null)
+            {
+                try
+                {
+                    using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, domain1Name))
+                    {
+                        GroupPrincipal group = GroupPrincipal.FindByIdentity(pc, subAdminGroupName);
+
+                        if (isAdd)
+                        {
+                            group.Members.Add(user);
+                        }
+                        else
+                        {
+                            group.Members.Remove(user);
+                        }
+
+                        group.Save();
+
+                        retval = true;
+                    }
+                }
+                catch (Exception E)
+                {
+
+                }
+
+            }
+            return retval;
+        }
+
         public async Task<bool> DeallocateMachine(string hostPoolName, string userName)
         {
             await Task.Run(() =>
@@ -422,6 +481,57 @@ namespace MngVm.BAL
             }
 
             return suffixList;
+        }
+
+        public List<User> GetAllSubAdminUsers()
+        {
+
+            SearchResultCollection results;
+            DirectorySearcher ds = null;
+
+            List<User> userList = new List<User>();
+            List<User> newUserList = new List<User>();
+            string[] ouArr = LDAPContants.LDAPOU.Split(",");
+            foreach (var ou in ouArr)
+            {
+                var _usersList = GetDirectoryEntry($"LDAP://{ipAddress}/OU={ou};DC={domain1Name};DC={domain2Name}");
+                ds = new DirectorySearcher(_usersList)
+                {
+                    Filter = $"(&(objectCategory=User)(objectClass=person)(memberOf=CN={subAdminGroupName},CN={subAdminGroupCN},DC={domain1Name},DC={domain2Name}))"
+                };
+
+                results = ds.FindAll();
+                if (results.Count > 0)
+                {
+                    foreach (SearchResult sr in results)
+                    {
+                        User user = new User
+                        {
+                            FirstName = sr.Properties["givenname"].Count > 0 ? Convert.ToString(sr.Properties["givenname"][0]) : string.Empty,
+                            LastName = sr.Properties["sn"].Count > 0 ? Convert.ToString(sr.Properties["sn"][0]) : string.Empty,
+                            UserName = sr.Properties["userprincipalname"].Count > 0 ? Convert.ToString(sr.Properties["userprincipalname"][0]) : string.Empty,
+                            Ou = ou,
+                        };
+                        userList.Add(user);
+                    }
+                    PowerShellCommand powershell = new PowerShellCommand();
+                    var userVmsList = powershell.getUserVmList();
+                    newUserList = (from ui in userList
+                                   join uvm in userVmsList on ui.UserName equals uvm.UserName into tuvm
+                                   from uvm in tuvm.DefaultIfEmpty()
+                                   select new User()
+                                   {
+                                       FirstName = ui.FirstName,
+                                       LastName = ui.LastName,
+                                       UserName = ui.UserName,
+                                       Ou = ui.Ou,
+                                       HostPoolName = uvm?.HostPoolName
+                                   }).ToList();
+
+
+                }
+            }
+            return newUserList.OrderBy(x => x.UserName).ToList();
         }
 
     }

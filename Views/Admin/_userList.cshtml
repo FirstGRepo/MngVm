@@ -2,6 +2,7 @@
 @model List<User>
 @{
     int count = 1;
+    bool IsAdmin = Session["isAdmin"] != null && Convert.ToBoolean(Session["isAdmin"]);
 }
 
 @if (Model != null)
@@ -35,6 +36,19 @@
                                 <td>
                                     <a href="/Admin/ChangePassword?userName=@user.UserName" title="Change Password" data-toggle="tooltip" data-placement="top" username=@user.UserName class="btn custmButton btnchngpas"><i class="fa fa-lock"></i></a>
                                     <button title="Delete User" data-toggle="tooltip" data-placement="top" username=@user.UserName hostPoolName=@user.HostPoolName class="btn custmButton btnDelete"><i class="fa fa-trash"></i></button>
+
+                                    @if (IsAdmin)
+                                    {
+                                        if (!@user.IsSubAdminAssigned)
+                                        {
+                                            <button title="Assign to sub-admin" data-toggle="tooltip" data-placement="top" username=@user.UserName hostPoolName=@user.HostPoolName class="btn custmButton btnAssignToSubAdmin"><i class="fa fa-tag" aria-hidden="true"></i></button>
+                                        }
+                                        else
+                                        {
+                                            <button title="Remove from sub-admin" data-toggle="tooltip" data-placement="top" username=@user.UserName hostPoolName=@user.HostPoolName class="btn custmButton btnRemoveAssignToSubAdmin"><i class="fa fa-tag" aria-hidden="true"></i></button>
+                                        }
+                                    }
+
                                 </td>
                             </tr>
                         }

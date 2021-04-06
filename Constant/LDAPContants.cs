@@ -14,5 +14,7 @@ namespace MngVm.Constant
         public static readonly string Domain2Name = Convert.ToString(ConfigurationManager.AppSettings["ldpdomain2"]);
         public static readonly string UserName = Convert.ToString(ConfigurationManager.AppSettings["ldpUsername"]);
         public static readonly string Password = Convert.ToString(ConfigurationManager.AppSettings["ldpPassword"]);
+        public static readonly string SubAdminGroupName = Convert.ToString(ConfigurationManager.AppSettings["ldpSubAdminGroup"]);
+        public static readonly string SubAdminGroupCN = Convert.ToString(ConfigurationManager.AppSettings["ldpSubAdminGroupCN"]);
     }
 }

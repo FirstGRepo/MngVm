@@ -68,6 +68,46 @@ $(document).on('click', '.btnDelete', function (e) {
     }
 });
 
+$(document).on('click', '.btnAssignToSubAdmin', function (e) {
+    var username = $(this).attr('username');
+    var hostPoolName = $(this).attr('hostPoolName');
+
+    AddRemoveSubAdmin(username, hostPoolName, true);
+    
+});
+
+
+$(document).on('click', '.btnRemoveAssignToSubAdmin', function (e) {
+    var username = $(this).attr('username');
+    var hostPoolName = $(this).attr('hostPoolName');
+
+    AddRemoveSubAdmin(username, hostPoolName, false);
+
+});
+
+
+function AddRemoveSubAdmin(username, hostPoolName, isAdd) {
+    $.ajax({
+        url: '/Admin/AddRemoveSubAdmin',
+        type: 'POST',
+        data: { userName: username, hostPool: hostPoolName, isAdd: isAdd },
+        dataType: 'json',
+        success: function (data) {
+            if (data)
+                loadListWithoutLoader();
+        },
+        error: function (request, error) {
+            alert("Request: " + JSON.stringify(request));
+            //  $('#success-alert').addClass('alert-danger');
+        }
+    });
+}
+
+function loadListWithoutLoader() {
+   
+    $('#userist').load('/Admin/List');
+}
+
 function loadList() {
     $('#loader').show();
     //$('#userist').load('/Admin/List');

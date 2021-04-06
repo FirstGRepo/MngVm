@@ -179,7 +179,7 @@ footer {
 
 .custmButton {
     color: white;
-    width: 35%;
+    width: 30%;
 }
 
 .btnDelete {
@@ -188,6 +188,16 @@ footer {
 
 .btnchngpas {
     background: #5882a7;
+}
+
+
+.btnAssignToSubAdmin {
+    background: #58cf3e;
+}
+
+
+.btnRemoveAssignToSubAdmin {
+    background: #ccd1cb;
 }
 
 .navbar-inverse .navbar-nav > li > a {

@@ -14,7 +14,7 @@ namespace MngVm.Filters
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            if (HttpContext.Current.Session["isAdmin"].IsNull())
+            if (HttpContext.Current.Session["isAdmin"].IsNull() && HttpContext.Current.Session["isSubAdmin"].IsNull())
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary{{ "controller", "Home" },
                                           { "action", "Unauthorize" }
