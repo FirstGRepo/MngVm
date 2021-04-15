@@ -1,4 +1,4 @@
-﻿using MngVm.BAL;
+using MngVm.BAL;
 using MngVm.Constant;
 using MngVm.Models;
 using System;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace MngVm.Controllers
 {
@@ -20,6 +21,8 @@ namespace MngVm.Controllers
             _azService = new AzurePortalService();
         }
 
+        [Authorize]
+        [NoCache]
         public ActionResult Index()
         {
             string username = Convert.ToString(Session["username"]);
@@ -77,47 +80,57 @@ namespace MngVm.Controllers
 
         public ActionResult Success()
         {
-            GoogleService google = new GoogleService();
-            string code = Convert.ToString(Request.QueryString["code"]);
-            string token = google.GetToken(code);
-            UserProfile userinfo = google.userProfile(token);
-            Session["username"] = userinfo.email;
-            if (string.IsNullOrEmpty(userinfo.email))
-                return Content("Email not found");
-            else
+            try
             {
-                if (Constant.Constant.IsAdmin(userinfo.email))
-                {
-                    Session["isAdmin"] = true;
-                    return RedirectToAction("index", "Admin");
-                }
-                else if(Constant.Constant.IsSubAdmin(userinfo.email))
-                {
-                    Session["isSubAdmin"] = true;
-                    return RedirectToAction("index", "Admin");
-                }
+                GoogleService google = new GoogleService();
+                string code = Convert.ToString(Request.QueryString["code"]);
+                string token = google.GetToken(code);
+                UserProfile userinfo = google.userProfile(token);
+                Session["username"] = userinfo.email;
+                if (string.IsNullOrEmpty(userinfo.email))
+                    return Content("Email not found");
                 else
                 {
-                    if (Constant.Constant.IsProduction)
+                    FormsAuthentication.SetAuthCookie(userinfo.email, false);
+                    if (Constant.Constant.IsAdmin(userinfo.email))
                     {
+                        Session["isAdmin"] = true;
+                        return RedirectToAction("index", "Admin");
+                    }
+                    else if (Constant.Constant.IsSubAdmin(userinfo.email))
+                    {
+                        Session["isSubAdmin"] = true;
+                        return RedirectToAction("index", "Admin");
+                    }
+                    else
+                    {
+                        //if (Constant.Constant.IsProduction)
+                        //{
                         //if (userinfo.email.Contains("@organizedgains.com"))
                         return RedirectToAction("index");
                         //else
                         //    return Redirect(GoogleContants.ExternalRedirection);
-                    }
-                    else
-                    {
-                        return RedirectToAction("index");
+                        //}
+                        //else
+                        //{
+                        //    return RedirectToAction("index");
+                        //}
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                return RedirectToAction("index");
+            }
         }
 
+        [Authorize]
         public ActionResult SignOut()
         {
-            Session.Abandon();
-            //return RedirectToAction("Index", "GoogleControl");
-            return RedirectPermanent("https://www.google.com/accounts/Logout");
+            Session.Clear();
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "GoogleControl");
+            //return RedirectPermanent("https://www.google.com/accounts/Logout");
         }
 
         public ActionResult Unauthorize()

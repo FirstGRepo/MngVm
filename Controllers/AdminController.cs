@@ -18,6 +18,8 @@ namespace MngVm.Controllers
             _ldapService = new LDAPService();
         }
 
+        [Authorize]
+        [NoCache]
         public ActionResult Index()
         {
             PowerShellCommand powershell = new PowerShellCommand();
@@ -45,11 +47,13 @@ namespace MngVm.Controllers
         {
             List<User> users = null;
 
-            if (Session["isAdmin"]!=null && Convert.ToBoolean(Session["isAdmin"]))
+            if (Session["isAdmin"] != null && Convert.ToBoolean(Session["isAdmin"]))
             {
-                users= _ldapService.GetAllUsers();
-            } else if(Session["isSubAdmin"] != null && Convert.ToBoolean(Session["isSubAdmin"])) {
-                users= _ldapService.GetAllSubAdminUsers();
+                users = _ldapService.GetAllUsers();
+            }
+            else if (Session["isSubAdmin"] != null && Convert.ToBoolean(Session["isSubAdmin"]))
+            {
+                users = _ldapService.GetAllSubAdminUsers();
             }
 
             return PartialView("_userList", users);

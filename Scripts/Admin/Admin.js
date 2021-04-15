@@ -94,7 +94,7 @@ function AddRemoveSubAdmin(username, hostPoolName, isAdd) {
         dataType: 'json',
         success: function (data) {
             if (data)
-                loadListWithoutLoader();
+                loadList(); //loadListWithoutLoader();
         },
         error: function (request, error) {
             alert("Request: " + JSON.stringify(request));

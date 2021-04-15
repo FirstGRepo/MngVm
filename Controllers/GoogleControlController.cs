@@ -16,6 +16,9 @@ namespace MngVm.Controllers
 {
     public class GoogleControlController : Controller
     {
+
+        [NoCache]
+        [NotAuthorize]
         public ActionResult Index()
         {
             if (Session["username"].IsNull())
@@ -23,6 +26,8 @@ namespace MngVm.Controllers
             else
                 return RedirectToAction("Index", "Home");
         }
+        
+        [NoCache]
         public ActionResult MainSite()
         {
             return View();

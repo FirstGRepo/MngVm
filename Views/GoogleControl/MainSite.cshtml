@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 
@@ -38,16 +38,16 @@
             xhr.send('idtoken=' + id_token);
         }
         function signOut(provider) {
-            if (provider == 'facebook') {
-                FB.logout(function (response) {
-                    window.location.href = 'logout.php?client=facebook';
-                });
-            } else {
-                var auth2 = gapi.auth2.getAuthInstance();
-                auth2.signOut().then(function () {
-                    window.location.href = 'logout.php?client=google';
-                });
-            }
+            //if (provider == 'facebook') {
+            //    FB.logout(function (response) {
+            //        window.location.href = 'logout.php?client=facebook';
+            //    });
+            //} else {
+            //    var auth2 = gapi.auth2.getAuthInstance();
+            //    auth2.signOut().then(function () {
+            //        window.location.href = 'logout.php?client=google';
+            //    });
+            //}
         }
         function onLoad() {
             gapi.load('auth2', function () {
