@@ -144,9 +144,9 @@ namespace MngVm.API
         public HttpResponseMessage ProcessVMScheduler(IList<RunCommandRequest> requestList)
         {
 
-            requestList = new List<RunCommandRequest>();
+           // requestList = new List<RunCommandRequest>();
 
-            GenerateDumbData(ref requestList);
+           // GenerateDumbData(ref requestList);
 
 
             if (requestList.IsNull())
