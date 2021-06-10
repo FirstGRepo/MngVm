@@ -28,17 +28,18 @@ namespace MngVm.Controllers
             else
                 ViewBag.OuList = new SelectList(LDAPContants.LDAPOU);
 
-            if (_ldapService.GetUPNSuffixes().IsNotNull() && _ldapService.GetUPNSuffixes().Count > 0)
-                ViewBag.Upn = new SelectList(_ldapService.GetUPNSuffixes());
+            var _upn = _ldapService.GetUPNSuffixes();
+            if (_upn.IsNotNull() && _upn.Count > 0)
+                ViewBag.Upn = new SelectList(_upn);
             else
-                ViewBag.Upn = new string[] { string.Empty };
+                ViewBag.Upn = new SelectList(new List<string>());
 
             var items = powershell.getHostPools();
 
             if (items.IsNotNull() && items.Count() > 0)
                 ViewBag.HostpoolList = new SelectList(items);
             else
-                ViewBag.HostpoolList = new string[] { string.Empty };
+                ViewBag.HostpoolList = new SelectList(new List<string>());
 
             return View();
         }

@@ -29,9 +29,10 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-4" for="email">Organization Unit:</label>
                                 <div class="col-sm-8">
-                                    @Html.DropDownListFor(m => m.Ou, (SelectList)ViewBag.OuList, "Please select", new { @class = "form-control required" })
+                                    @Html.DropDownListFor(m => m.Ou, (ViewBag.Upn == null ? new SelectList(new List<string>()) : (ViewBag.Upn as SelectList)), "Please select", new { @class = "form-control required" })
                                 </div>
                             </div>
+                            @*ViewBag.OuList*@
 
                             <div class="form-group">
                                 <label class="control-label col-sm-4" for="email">First Name:</label>
@@ -51,14 +52,14 @@
                                 <label class="control-label col-sm-4" for="email">Logon Name:</label>
                                 <div class="col-sm-8">
                                     @Html.TextBoxFor(m => m.UserName, new { @class = "form-control required", maxlength = "50", placeholder = "Logon Name / Username" })
-                                    @Html.DropDownListFor(m => m.UPNSuffix, (SelectList)ViewBag.Upn, "Please Select", new { @class = "form-control required" })
+                                    @Html.DropDownListFor(m => m.UPNSuffix, (ViewBag.Upn == null ? new SelectList(new List<string>()) : (ViewBag.Upn as SelectList)), "Please Select", new { @class = "form-control required" })
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="control-label col-sm-4" for="email">Hostpool Name:</label>
                                 <div class="col-sm-8">
-                                    @Html.DropDownListFor(m => m.HostPoolName, (SelectList)ViewBag.HostpoolList, "Please select", new { @class = "form-control required" })
+                                    @Html.DropDownListFor(m => m.HostPoolName, (ViewBag.HostpoolList == null ? new SelectList(new List<string>()) : (ViewBag.HostpoolList as SelectList)), "Please select", new { @class = "form-control required" })
                                     <div id="messageSection" hidden="hidden">
                                         <ul class="list-group" id="vmlist" style="margin: 0;"></ul>
                                     </div>
