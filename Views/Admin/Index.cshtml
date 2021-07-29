@@ -29,7 +29,7 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-4" for="email">Organization Unit:</label>
                                 <div class="col-sm-8">
-                                    @Html.DropDownListFor(m => m.Ou, (ViewBag.Upn == null ? new SelectList(new List<string>()) : (ViewBag.Upn as SelectList)), "Please select", new { @class = "form-control required" })
+                                    @Html.DropDownListFor(m => m.Ou, (ViewBag.OuList == null ? new SelectList(new List<string>()) : (ViewBag.OuList as SelectList)), "Please select", new { @class = "form-control required" })
                                 </div>
                             </div>
                             @*ViewBag.OuList*@
